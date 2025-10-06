@@ -24,21 +24,31 @@ class GraphqlController < ApplicationController
   private
 
   # Ensure player_uuid cookie exists and return its value
-  # If cookie doesn't exist, generate new UUID and set it
+  # If cookie doesn't exist or Player doesn't exist, generate new UUID and create Player
   def ensure_player_uuid
     player_uuid = cookies.encrypted[:player_uuid]
 
-    if player_uuid.blank?
-      player_uuid = SecureRandom.uuid
-      cookies.encrypted[:player_uuid] = {
-        value: player_uuid,
-        expires: 1.day.from_now,
-        httponly: true,
-        secure: Rails.env.production?
-      }
+    # Check if cookie exists and corresponding Player exists
+    if player_uuid.present? && Player.exists?(uuid: player_uuid)
+      return player_uuid
     end
 
+    # Generate new UUID and create Player record
+    player_uuid = SecureRandom.uuid
+    Player.create!(uuid: player_uuid)
+
+    set_player_uuid_cookie(player_uuid)
+
     player_uuid
+  end
+
+  def set_player_uuid_cookie(player_uuid)
+    cookies.encrypted[:player_uuid] = {
+      value: player_uuid,
+      expires: 1.day.from_now,
+      httponly: true,
+      secure: Rails.env.production?
+    }
   end
 
   # Handle variables in form data, JSON body, or a blank value
