@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_06_141745) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_06_145158) do
   create_table "answers", force: :cascade do |t|
     t.integer "player_id", null: false
     t.integer "question_id", null: false
@@ -22,6 +22,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_06_141745) do
     t.index ["player_id", "question_id"], name: "index_answers_on_player_id_and_question_id", unique: true
     t.index ["player_id"], name: "index_answers_on_player_id"
     t.index ["question_id"], name: "index_answers_on_question_id"
+  end
+
+  create_table "current_quiz_states", force: :cascade do |t|
+    t.integer "active_question_id"
+    t.datetime "question_started_at"
+    t.integer "duration_seconds"
+    t.datetime "question_ends_at"
+    t.string "persist_job_id"
+    t.boolean "quiz_active", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["id"], name: "index_current_quiz_states_on_id", unique: true
   end
 
   create_table "players", force: :cascade do |t|
@@ -43,4 +55,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_06_141745) do
 
   add_foreign_key "answers", "players"
   add_foreign_key "answers", "questions"
+  add_foreign_key "current_quiz_states", "questions", column: "active_question_id"
 end
