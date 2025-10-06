@@ -8,6 +8,15 @@ Bundler.require(*Rails.groups)
 
 module Re2q
   class Application < Rails::Application
+    config.active_record.query_log_tags_enabled = true
+    config.active_record.query_log_tags = [
+      # Rails query log tags:
+      :application, :controller, :action, :job,
+      # GraphQL-Ruby query log tags:
+      current_graphql_operation: -> { GraphQL::Current.operation_name },
+      current_graphql_field: -> { GraphQL::Current.field&.path },
+      current_dataloader_source: -> { GraphQL::Current.dataloader_source_class }
+    ]
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
 
@@ -23,5 +32,8 @@ module Re2q
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Configure Solid Cache to connect to the cache database
+    config.solid_cache.connects_to = { database: { writing: :cache } }
   end
 end

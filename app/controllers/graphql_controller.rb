@@ -1,0 +1,80 @@
+# frozen_string_literal: true
+
+class GraphqlController < ApplicationController
+  # If accessing from outside this domain, nullify the session
+  # This allows for outside API access while preventing CSRF attacks,
+  # but you'll have to authenticate your user separately
+  protect_from_forgery with: :null_session
+
+  def execute
+    variables = prepare_variables(params[:variables])
+    query = params[:query]
+    operation_name = params[:operationName]
+    player_uuid = ensure_player_uuid
+    context = {
+      player_uuid: player_uuid
+    }
+    result = Re2qSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
+    render json: result
+  rescue StandardError => e
+    raise e unless Rails.env.development?
+    handle_error_in_development(e)
+  end
+
+  private
+
+  # Ensure player_uuid cookie exists and return its value
+  # If cookie doesn't exist or Player doesn't exist, generate new UUID and create Player
+  def ensure_player_uuid
+    player_uuid = cookies.encrypted[:player_uuid]
+
+    # Check if cookie exists and corresponding Player exists
+    if player_uuid.present? && Player.exists?(uuid: player_uuid)
+      return player_uuid
+    end
+
+    # Generate new UUID and create Player record
+    player_uuid = SecureRandom.uuid
+    Player.create!(uuid: player_uuid)
+
+    set_player_uuid_cookie(player_uuid)
+
+    player_uuid
+  end
+
+  def set_player_uuid_cookie(player_uuid)
+    cookies.encrypted[:player_uuid] = {
+      value: player_uuid,
+      expires: 1.day.from_now,
+      httponly: true,
+      secure: Rails.env.production?
+    }
+  end
+
+  # Handle variables in form data, JSON body, or a blank value
+  def prepare_variables(variables_param)
+    case variables_param
+    when String
+      if variables_param.present?
+        JSON.parse(variables_param) || {}
+      else
+        {}
+      end
+    when Hash
+      variables_param
+    when ActionController::Parameters
+      variables_param.to_unsafe_hash # GraphQL-Ruby will validate name and type of incoming variables.
+    when nil
+      {}
+    else
+      raise ArgumentError, "Unexpected parameter: #{variables_param}"
+    end
+  end
+
+  def handle_error_in_development(e)
+    logger.error e.message
+    logger.error e.backtrace.join("\n")
+
+    render json: { errors: [ { message: e.message, backtrace: e.backtrace } ], data: {} }, status: 500
+  end
+end
