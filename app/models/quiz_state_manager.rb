@@ -11,15 +11,14 @@ class QuizStateManager
       now = Time.current
       ends_at = now + question.duration_seconds.seconds
 
-      # TODO: Issue #11 - 永続化Jobをキック（question_ends_atまで1秒間隔でループ実行し自動停止）
-      # persist_job = PersistAnswersJob.perform_later(question_id)
+      # Issue #11 - 永続化Jobをキック（question_ends_atまで1秒間隔でループ実行し自動停止）
+      PersistAnswersJob.perform_later(question_id)
 
       state.update!(
         active_question_id: question_id,
         question_started_at: now,
         duration_seconds: question.duration_seconds,
         question_ends_at: ends_at
-        # TODO: Issue #11 - persist_job_id: persist_job.job_id
       )
 
       state
