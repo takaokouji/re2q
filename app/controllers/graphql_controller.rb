@@ -10,10 +10,15 @@ class GraphqlController < ApplicationController
     variables = prepare_variables(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
-    player_uuid = ensure_player_uuid
+
+    # Cookie から player を取得または作成
+    player = find_or_create_player_from_cookie
+
     context = {
-      player_uuid: player_uuid
+      current_player: player,
+      player_uuid: player.uuid  # 後方互換性のため残す
     }
+
     result = Re2qSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
   rescue StandardError => e
@@ -23,32 +28,34 @@ class GraphqlController < ApplicationController
 
   private
 
-  # Ensure player_uuid cookie exists and return its value
-  # If cookie doesn't exist or Player doesn't exist, generate new UUID and create Player
-  def ensure_player_uuid
+  # Cookie から player を取得または作成
+  def find_or_create_player_from_cookie
     player_uuid = cookies.encrypted[:player_uuid]
 
-    # Check if cookie exists and corresponding Player exists
-    if player_uuid.present? && Player.exists?(uuid: player_uuid)
-      return player_uuid
+    if player_uuid.blank?
+      # 新規 Player を作成
+      player = Player.create!(uuid: SecureRandom.uuid)
+      cookies.encrypted[:player_uuid] = {
+        value: player.uuid,
+        expires: 1.year.from_now,
+        httponly: true,
+        secure: Rails.env.production?
+      }
+      player
+    else
+      # 既存の Player を取得（存在しない場合は新規作成）
+      player = Player.find_by(uuid: player_uuid)
+      if player.nil?
+        player = Player.create!(uuid: SecureRandom.uuid)
+        cookies.encrypted[:player_uuid] = {
+          value: player.uuid,
+          expires: 1.year.from_now,
+          httponly: true,
+          secure: Rails.env.production?
+        }
+      end
+      player
     end
-
-    # Generate new UUID and create Player record
-    player_uuid = SecureRandom.uuid
-    Player.create!(uuid: player_uuid)
-
-    set_player_uuid_cookie(player_uuid)
-
-    player_uuid
-  end
-
-  def set_player_uuid_cookie(player_uuid)
-    cookies.encrypted[:player_uuid] = {
-      value: player_uuid,
-      expires: 1.day.from_now,
-      httponly: true,
-      secure: Rails.env.production?
-    }
   end
 
   # Handle variables in form data, JSON body, or a blank value
