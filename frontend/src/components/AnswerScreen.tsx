@@ -101,8 +101,18 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
   return (
     <Box minH="100vh" bg="gray.50" display="flex" flexDirection="column">
       {/* ヘッダー */}
-      <Box bg="blue.500" color="white" py={4} px={6} boxShadow="md">
-        <Heading size="md">re2q - リアルタイム二択クイズ</Heading>
+      <Box
+        bg="blue.500"
+        color="white"
+        py={4}
+        px={6}
+        boxShadow="md"
+        cursor="pointer"
+        onClick={() => window.open('https://github.com/takaokouji/re2q/', '_blank', 'noopener,noreferrer')}
+        _hover={{ bg: 'blue.600' }}
+        transition="background-color 0.2s"
+      >
+        <Heading size="md" mb={0}>{ "{ re2q }" }</Heading>
       </Box>
 
       {/* 状態表示 */}
