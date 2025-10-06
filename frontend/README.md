@@ -1,4 +1,34 @@
-# React + TypeScript + Vite
+# re2q Frontend
+
+React + TypeScript + Vite フロントエンド
+
+## 開発環境
+
+### 起動方法
+
+```bash
+npm run dev
+```
+
+ブラウザで http://localhost:5173/ にアクセスしてください。
+
+### 主な機能
+
+- **Cookie認証**: 初回アクセス時に自動的にプレイヤーUUIDがCookieに保存されます
+- **GraphQL統合**: Apollo Clientを使用してバックエンドと通信
+- **リアルタイム性**: `network-only` ポリシーでポーリングに対応
+
+### ランディングページ (Issue #14)
+
+ランディングページは以下の機能を提供します：
+
+- Cookie認証の動作確認
+- GraphQLエンドポイントへの接続テスト
+- プレイヤーの回答履歴表示
+
+初回アクセス時にバックエンドがCookieを自動発行し、プレイヤーを識別します。
+
+## テンプレート情報
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

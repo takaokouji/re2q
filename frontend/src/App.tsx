@@ -1,34 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { gql } from '@apollo/client'
+import { useQuery } from '@apollo/client/react'
 import './App.css'
 
+const TEST_COOKIE_QUERY = gql`
+  query TestCookieAuth {
+    testField
+    myAnswers {
+      id
+    }
+  }
+`
+
 function App() {
-  const [count, setCount] = useState(0)
+  const { loading, error, data } = useQuery(TEST_COOKIE_QUERY)
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+    <div className="landing-page">
+      <h1>re2q - リアルタイム二択クイズ</h1>
+
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <h2>Cookie認証テスト</h2>
+
+        {loading && <p>認証中...</p>}
+
+        {error && (
+          <div className="error">
+            <p>エラーが発生しました</p>
+            <pre>{error.message}</pre>
+          </div>
+        )}
+
+        {data && (
+          <div className="success">
+            <p>✓ Cookie認証が正常に動作しています</p>
+            <p>GraphQL接続: {data.testField}</p>
+            <p>回答履歴: {data.myAnswers.length}件</p>
+            <details>
+              <summary>詳細情報</summary>
+              <pre>{JSON.stringify(data, null, 2)}</pre>
+            </details>
+          </div>
+        )}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+      <div className="info">
+        <p>このページにアクセスすると、自動的にプレイヤーIDがCookieに保存されます。</p>
+        <p>ブラウザの開発者ツールでCookieを確認できます（暗号化されています）。</p>
+      </div>
+    </div>
   )
 }
 

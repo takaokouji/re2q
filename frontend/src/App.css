@@ -5,38 +5,100 @@
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+h1 {
+  font-size: 2.5em;
+  margin-bottom: 0.5em;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+h2 {
+  font-size: 1.5em;
+  margin-bottom: 1em;
 }
 
 .card {
   padding: 2em;
+  border-radius: 8px;
+  background-color: #1a1a1a;
 }
 
-.read-the-docs {
-  color: #888;
+@media (prefers-color-scheme: light) {
+  .card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+  }
+}
+
+.success {
+  color: #4ade80;
+  text-align: left;
+  padding: 1em;
+  border-radius: 4px;
+  background-color: rgba(74, 222, 128, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .success {
+    color: #16a34a;
+    background-color: rgba(22, 163, 74, 0.1);
+  }
+}
+
+.error {
+  color: #f87171;
+  text-align: left;
+  padding: 1em;
+  border-radius: 4px;
+  background-color: rgba(248, 113, 113, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .error {
+    color: #dc2626;
+    background-color: rgba(220, 38, 38, 0.1);
+  }
+}
+
+.info {
+  padding: 1.5em;
+  border-radius: 8px;
+  background-color: rgba(100, 108, 255, 0.1);
+  font-size: 0.9em;
+}
+
+details {
+  margin-top: 1em;
+  text-align: left;
+}
+
+summary {
+  cursor: pointer;
+  padding: 0.5em;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+summary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+pre {
+  margin-top: 0.5em;
+  padding: 1em;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.2);
+  overflow-x: auto;
+  font-size: 0.85em;
+  text-align: left;
+}
+
+@media (prefers-color-scheme: light) {
+  pre {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
 }
