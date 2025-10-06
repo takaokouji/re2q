@@ -24,6 +24,12 @@ module Mutations
         answered_at: Time.current.iso8601
       }, expires_in: 1.hour)
 
+      # キーリストに追加（PersistAnswersJob が使用）
+      key_list_key = "answer_keys:#{question_id}"
+      answer_keys = Rails.cache.read(key_list_key) || []
+      answer_keys << cache_key unless answer_keys.include?(cache_key)
+      Rails.cache.write(key_list_key, answer_keys, expires_in: 1.hour)
+
       # DBから現在の回答履歴を取得（現在の回答は含まない）
       my_answers = player.answers.includes(:question).order(answered_at: :asc)
 
