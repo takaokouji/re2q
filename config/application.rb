@@ -23,5 +23,8 @@ module Re2q
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Configure Solid Cache to connect to the cache database
+    config.solid_cache.connects_to = { database: { writing: :cache } }
   end
 end

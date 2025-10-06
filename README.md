@@ -44,6 +44,9 @@ bin/rails db:migrate
 
 # 開発サーバーの起動
 bin/dev
+
+# Solid Queueワーカーの起動（別ターミナル）
+bin/jobs
 ```
 
 ## アーキテクチャ
