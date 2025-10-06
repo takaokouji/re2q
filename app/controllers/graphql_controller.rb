@@ -10,9 +10,9 @@ class GraphqlController < ApplicationController
     variables = prepare_variables(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
+    player_uuid = ensure_player_uuid
     context = {
-      # Query context goes here, for example:
-      # current_user: current_user,
+      player_uuid: player_uuid
     }
     result = Re2qSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
@@ -22,6 +22,24 @@ class GraphqlController < ApplicationController
   end
 
   private
+
+  # Ensure player_uuid cookie exists and return its value
+  # If cookie doesn't exist, generate new UUID and set it
+  def ensure_player_uuid
+    player_uuid = cookies.encrypted[:player_uuid]
+
+    if player_uuid.blank?
+      player_uuid = SecureRandom.uuid
+      cookies.encrypted[:player_uuid] = {
+        value: player_uuid,
+        expires: 1.day.from_now,
+        httponly: true,
+        secure: Rails.env.production?
+      }
+    end
+
+    player_uuid
+  end
 
   # Handle variables in form data, JSON body, or a blank value
   def prepare_variables(variables_param)
