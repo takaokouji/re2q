@@ -2,15 +2,15 @@ module Mutations
   class StartQuestionMutation < Mutations::BaseMutation
     description "質問を開始する（管理者用）"
 
-    argument :question_id, ID, required: true
+    argument :question_id, ID, required: true, loads: Types::QuestionType, as: :target_question
 
     field :current_quiz_state, Types::CurrentQuizStateType, null: false
     field :errors, [ String ], null: false
 
-    def resolve(question_id:)
+    def resolve(target_question:)
       # TODO: 管理者認証チェック
 
-      state = QuizStateManager.start_question(question_id)
+      state = QuizStateManager.start_question(target_question.id)
 
       {
         current_quiz_state: state,

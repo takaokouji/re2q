@@ -1,6 +1,6 @@
 module Types
   class QuestionType < Types::BaseObject
-    field :id, ID, null: false
+    global_id_field :id
     field :content, String, null: false
     field :correct_answer, Boolean, null: false
     field :duration_seconds, Integer, null: false

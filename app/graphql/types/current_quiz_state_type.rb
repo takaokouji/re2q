@@ -2,7 +2,7 @@ module Types
   class CurrentQuizStateType < Types::BaseObject
     description "Current quiz state"
 
-    field :id, ID, null: false
+    global_id_field :id
     field :quiz_active, Boolean, null: false, description: "クイズ全体がアクティブか"
     field :active_question_id, ID, null: true, description: "現在アクティブな質問ID"
     field :question_started_at, GraphQL::Types::ISO8601DateTime, null: true

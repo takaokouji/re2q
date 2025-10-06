@@ -2,7 +2,7 @@ module Types
   class RankingEntryType < Types::BaseObject
     description "Ranking entry"
 
-    field :player_id, ID, null: false
+    global_id_field :player_id
     field :player_uuid, String, null: false
     field :correct_count, Integer, null: false, description: "正解数"
     field :total_answered, Integer, null: false, description: "回答数"

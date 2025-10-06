@@ -1,6 +1,6 @@
 module Types
   class AnswerType < Types::BaseObject
-    field :id, ID, null: false
+    global_id_field :id
     field :player_id, ID, null: false
     field :question_id, ID, null: false
     field :player_answer, Boolean, null: false
