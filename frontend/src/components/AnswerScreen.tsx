@@ -11,6 +11,11 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 
+interface Player {
+  id: string;
+  name: string;
+}
+
 interface Answer {
   id: string;
   player: {
@@ -39,6 +44,7 @@ interface QuizState {
 }
 
 interface AnswerScreenProps {
+  me: Player | null;
   quizState: QuizState | null;
   answers: Answer[];
   onSubmitAnswer: (answer: boolean) => Promise<void>;
@@ -48,6 +54,7 @@ interface AnswerScreenProps {
 
 
 export const AnswerScreen: React.FC<AnswerScreenProps> = ({
+  me,
   quizState,
   answers,
   onSubmitAnswer,
@@ -125,7 +132,7 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
         _hover={{ bg: 'blue.600' }}
         transition="background-color 0.2s"
       >
-        <Heading size="md" mb={0}>{ "{ re2q }" }</Heading>
+        <Heading size="md" mb={0}>{ `【ID:${me?.name}】` }</Heading>
       </Box>
 
       {/* 情報表示 */}

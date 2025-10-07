@@ -38,6 +38,10 @@ export const GET_MY_ANSWERS = gql`
 // クイズ状態と回答履歴を同時取得
 export const GET_QUIZ_DATA = gql`
   query GetQuizData {
+    me {
+      id
+      name
+    }
     currentQuizState {
       id
       quizActive
