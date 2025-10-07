@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -61,9 +61,20 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
 }) => {
   const [submitting, setSubmitting] = useState(false);
   const [lastSubmittedAnswer, setLastSubmittedAnswer] = useState<boolean | null>(null);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+
+  // クールダウンタイマー
+  useEffect(() => {
+    if (cooldownRemaining > 0) {
+      const timer = setTimeout(() => {
+        setCooldownRemaining(cooldownRemaining - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldownRemaining]);
 
   const handleSubmit = async (answer: boolean) => {
-    if (submitting || loading || !quizState) return;
+    if (submitting || loading || !quizState || cooldownRemaining > 0) return;
 
     setSubmitting(true);
     setLastSubmittedAnswer(answer);
@@ -73,6 +84,7 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
     } catch (error) {
       console.error('Failed to submit answer:', error);
     } finally {
+      setCooldownRemaining(3); // 成功・失敗に関わらず3秒間のクールダウンを設定
       setSubmitting(false);
     }
   };
@@ -82,14 +94,15 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
     ? answers.some(a => a.questionId === quizState.activeQuestionId)
     : false;
 
-  // ボタンの無効化判定（通信中以外は回答可能）
-  const isButtonDisabled = loading || !quizState || submitting;
+  // ボタンの無効化判定（通信中、クールダウン中は回答不可）
+  const isButtonDisabled = loading || !quizState || submitting || cooldownRemaining > 0;
 
   // ステータスメッセージ
   const getStatusMessage = () => {
     if (loading) return 'データを読み込み中...';
     if (!quizState) return 'クイズ情報を取得中...';
     if (submitting) return '送信中...';
+    if (cooldownRemaining > 0) return `少しお待ち下さい\n${cooldownRemaining}秒...`;
     if (!quizState.quizActive) return 'しばらくお待ち下さい\n出題されたら回答してください！';
     if (!quizState.activeQuestion) return 'しばらくお待ち下さい\n次の問題が出題されたら回答してください！';
     if (hasAnsweredCurrentQuestion) return `第${quizState.activeQuestion.questionNumber}問に回答済み\n次の問題が出題されたら回答してください！`;
