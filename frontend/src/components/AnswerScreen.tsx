@@ -143,13 +143,16 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
             size="lg"
             height="120px"
             fontSize="6xl"
-            colorScheme="green"
+            colorPalette="green"
+            bg="green.500"
+            color="white"
             borderRadius="xl"
             boxShadow="lg"
             disabled={isButtonDisabled}
             onClick={() => handleSubmit(true)}
-            _active={{ transform: 'scale(0.98)' }}
-            _hover={{ transform: isButtonDisabled ? 'none' : 'scale(1.02)' }}
+            _active={{ transform: 'scale(0.98)', bg: 'green.700' }}
+            _hover={{ transform: isButtonDisabled ? 'none' : 'scale(1.02)', bg: isButtonDisabled ? 'green.500' : 'green.600' }}
+            _disabled={{ opacity: 0.4, cursor: 'not-allowed' }}
             transition="all 0.2s"
             aria-label="正解と回答"
             aria-pressed={lastSubmittedAnswer === true && submitting}
@@ -170,13 +173,16 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
             size="lg"
             height="120px"
             fontSize="6xl"
-            colorScheme="red"
+            colorPalette="red"
+            bg="red.500"
+            color="white"
             borderRadius="xl"
             boxShadow="lg"
             disabled={isButtonDisabled}
             onClick={() => handleSubmit(false)}
-            _active={{ transform: 'scale(0.98)' }}
-            _hover={{ transform: isButtonDisabled ? 'none' : 'scale(1.02)' }}
+            _active={{ transform: 'scale(0.98)', bg: 'red.700' }}
+            _hover={{ transform: isButtonDisabled ? 'none' : 'scale(1.02)', bg: isButtonDisabled ? 'red.500' : 'red.600' }}
+            _disabled={{ opacity: 0.4, cursor: 'not-allowed' }}
             transition="all 0.2s"
             aria-label="不正解と回答"
             aria-pressed={lastSubmittedAnswer === false && submitting}
