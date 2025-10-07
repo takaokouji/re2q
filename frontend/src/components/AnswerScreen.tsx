@@ -113,7 +113,7 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
       </Box>
 
       {/* 情報表示 */}
-      <Box height="14vh" py={6} px={6} textAlign="center" bg="white" boxShadow="sm">
+      <Box height="12vh" py={6} px={6} textAlign="center" bg="white" boxShadow="sm">
         <Text fontSize="md" fontWeight="bold" color="gray.700">
           {getStatusMessage()}
         </Text>
