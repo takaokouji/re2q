@@ -7,10 +7,8 @@ import {
   Stack,
   Text,
   VStack,
-  Badge,
   HStack,
 } from '@chakra-ui/react';
-import { css, keyframes } from '@emotion/react';
 import React from 'react';
 
 interface Answer {
@@ -48,11 +46,6 @@ interface AnswerScreenProps {
   loading?: boolean;
 }
 
-// パルスアニメーション定義
-const pulse = keyframes`
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
-`;
 
 export const AnswerScreen: React.FC<AnswerScreenProps> = ({
   quizState,
@@ -109,10 +102,10 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
     if (!quizState) return 'クイズ情報を取得中...';
     if (submitting) return '送信中...';
     if (cooldownRemaining > 0) return `少しお待ち下さい\n${cooldownRemaining}秒...`;
-    if (!quizState.quizActive) return 'しばらくお待ち下さい\n出題されたら回答してください！';
-    if (!quizState.activeQuestion) return 'しばらくお待ち下さい\n次の問題が出題されたら回答してください！';
+    if (!quizState.quizActive) return 'クイズ開始までお待ち下さい\n開始されたら回答してください！';
+    if (!quizState.activeQuestion) return '出題までお待ち下さい\n出題されたら回答してください！';
     if (hasAnsweredCurrentQuestion) return `第${quizState.activeQuestion.questionNumber}問に回答済み\n次の問題が出題されたら回答してください！`;
-    return `第${quizState.activeQuestion.questionNumber}問\n回答してください！`;
+    return `第${quizState.activeQuestion.questionNumber}問 - 回答してください！`;
   };
 
   return (
@@ -142,23 +135,6 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
             </React.Fragment>
           ))}
         </Text>
-        {quizState?.activeQuestion && (
-          <HStack justify="center" mt={2}>
-            <Badge colorScheme="blue" fontSize="md" px={3} py={1}>
-              問題 {quizState.activeQuestion.questionNumber}
-            </Badge>
-            {hasAnsweredCurrentQuestion && (
-              <Badge colorScheme="green" fontSize="md" px={3} py={1}>
-                回答済み
-              </Badge>
-            )}
-            {quizState.remainingSeconds > 0 && (
-              <Badge colorScheme="orange" fontSize="md" px={3} py={1}>
-                残り {quizState.remainingSeconds}秒
-              </Badge>
-            )}
-          </HStack>
-        )}
       </Box>
 
       {/* 回答ボタン */}
@@ -183,13 +159,6 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
             aria-pressed={lastSubmittedAnswer === true && submitting}
             position="relative"
             overflow="hidden"
-            css={
-              quizState?.questionActive && !hasAnsweredCurrentQuestion && !submitting
-                ? css`
-                    animation: ${pulse} 2s ease-in-out infinite;
-                  `
-                : undefined
-            }
           >
             ◯
           </Button>
@@ -213,13 +182,6 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
             aria-pressed={lastSubmittedAnswer === false && submitting}
             position="relative"
             overflow="hidden"
-            css={
-              quizState?.questionActive && !hasAnsweredCurrentQuestion && !submitting
-                ? css`
-                    animation: ${pulse} 2s ease-in-out infinite;
-                  `
-                : undefined
-            }
           >
             ✗
           </Button>

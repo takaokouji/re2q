@@ -4,7 +4,6 @@ module Mutations
 
     argument :answer, Boolean, required: true, description: "◯ (true) or ✗ (false)"
 
-    field :question_id, ID, null: true, description: "回答した質問のGlobalID"
     field :errors, [ String ], null: false
 
     def resolve(answer:)
@@ -30,17 +29,11 @@ module Mutations
       answer_keys << cache_key unless answer_keys.include?(cache_key)
       Rails.cache.write(key_list_key, answer_keys, expires_in: 1.hour)
 
-      # 質問のGlobalIDを返す
-      question = Question.find(question_id)
-      global_id = Re2qSchema.id_from_object(question, Types::QuestionType, context)
-
       {
-        question_id: global_id,
         errors: []
       }
     rescue StandardError => e
       {
-        question_id: nil,
         errors: [ e.message ]
       }
     end
