@@ -38,7 +38,7 @@ interface QuizData {
 
 interface SubmitAnswerData {
   submitAnswer: {
-    myAnswers: Answer[];
+    questionId: string | null;
     errors: string[];
   };
 }
@@ -48,13 +48,10 @@ interface SubmitAnswerVariables {
 }
 
 function App() {
-  const { data, loading, error } = useApolloQuery<QuizData>(GET_QUIZ_DATA);
+  const { data, loading, error, refetch } = useApolloQuery<QuizData>(GET_QUIZ_DATA);
 
   const [submitAnswerMutation] = useApolloMutation<SubmitAnswerData, SubmitAnswerVariables>(
-    SUBMIT_ANSWER,
-    {
-      refetchQueries: [{ query: GET_QUIZ_DATA }],
-    }
+    SUBMIT_ANSWER
   );
 
   const handleSubmitAnswer = async (answer: boolean) => {
@@ -73,6 +70,14 @@ function App() {
     }
   };
 
+  const handleCooldownEnd = async () => {
+    try {
+      await refetch();
+    } catch (err) {
+      console.error('Failed to refetch quiz data:', err);
+    }
+  };
+
   if (error) {
     return (
       <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -87,6 +92,7 @@ function App() {
       quizState={data?.currentQuizState || null}
       answers={data?.myAnswers || []}
       onSubmitAnswer={handleSubmitAnswer}
+      onCooldownEnd={handleCooldownEnd}
       loading={loading && !data}
     />
   );
