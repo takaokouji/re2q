@@ -11,6 +11,7 @@ import {
   HStack,
 } from '@chakra-ui/react';
 import { css, keyframes } from '@emotion/react';
+import React from 'react';
 
 interface Answer {
   id: string;
@@ -89,10 +90,10 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
     if (loading) return 'データを読み込み中...';
     if (!quizState) return 'クイズ情報を取得中...';
     if (submitting) return '送信中...';
-    if (!quizState.quizActive) return '問題が表示されたら回答してください';
-    if (!quizState.activeQuestion) return '回答してください';
-    if (hasAnsweredCurrentQuestion) return '回答済み - 次の問題が表示されたら回答してください';
-    return `第${quizState.activeQuestion.questionNumber}問 - 回答してください！`;
+    if (!quizState.quizActive) return 'しばらくお待ち下さい\n出題されたら回答してください！';
+    if (!quizState.activeQuestion) return 'しばらくお待ち下さい\n次の問題が出題されたら回答してください！';
+    if (hasAnsweredCurrentQuestion) return `第${quizState.activeQuestion.questionNumber}問に回答済み\n次の問題が出題されたら回答してください！`;
+    return `第${quizState.activeQuestion.questionNumber}問\n回答してください！`;
   };
 
   return (
@@ -115,7 +116,12 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
       {/* 情報表示 */}
       <Box height="12vh" py={6} px={6} textAlign="center" bg="white" boxShadow="sm">
         <Text fontSize="md" fontWeight="bold" color="gray.700">
-          {getStatusMessage()}
+          {getStatusMessage().split('\n').map((line, index) => (
+            <React.Fragment key={index}>
+              {line}
+              <br />
+            </React.Fragment>
+          ))}
         </Text>
         {quizState?.activeQuestion && (
           <HStack justify="center" mt={2}>
