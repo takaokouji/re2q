@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 class GraphqlController < ApplicationController
-  # If accessing from outside this domain, nullify the session
-  # This allows for outside API access while preventing CSRF attacks,
-  # but you'll have to authenticate your user separately
-  protect_from_forgery with: :null_session
+  # CSRF protection exemption for GraphQL API
+  # Cookie-based authentication is still functional
+  skip_before_action :verify_authenticity_token
 
   def execute
     variables = prepare_variables(params[:variables])
@@ -39,7 +38,8 @@ class GraphqlController < ApplicationController
         value: player.uuid,
         expires: 1.day.from_now,
         httponly: true,
-        secure: Rails.env.production?
+        secure: Rails.env.production?,
+        same_site: :lax  # クロスオリジンリクエストでもcookieを送信可能に
       }
       player
     else
@@ -51,7 +51,8 @@ class GraphqlController < ApplicationController
           value: player.uuid,
           expires: 1.day.from_now,
           httponly: true,
-          secure: Rails.env.production?
+          secure: Rails.env.production?,
+          same_site: :lax  # クロスオリジンリクエストでもcookieを送信可能に
         }
       end
       player
