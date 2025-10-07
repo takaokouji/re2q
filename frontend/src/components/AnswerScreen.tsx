@@ -62,7 +62,7 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
   const [lastSubmittedAnswer, setLastSubmittedAnswer] = useState<boolean | null>(null);
 
   const handleSubmit = async (answer: boolean) => {
-    if (submitting || !isAcceptingAnswers) return;
+    if (submitting || loading || !quizState) return;
 
     setSubmitting(true);
     setLastSubmittedAnswer(answer);
@@ -76,25 +76,22 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
     }
   };
 
-  // 回答受付中かどうか
-  const isAcceptingAnswers = quizState?.questionActive ?? false;
-
   // 現在の問題に対して既に回答済みかどうか
   const hasAnsweredCurrentQuestion = quizState?.activeQuestionId
     ? answers.some(a => a.questionId === quizState.activeQuestionId)
     : false;
 
-  // ボタンの無効化判定
-  const isButtonDisabled = !isAcceptingAnswers || hasAnsweredCurrentQuestion || submitting;
+  // ボタンの無効化判定（通信中以外は回答可能）
+  const isButtonDisabled = loading || !quizState || submitting;
 
   // ステータスメッセージ
   const getStatusMessage = () => {
     if (loading) return 'データを読み込み中...';
     if (!quizState) return 'クイズ情報を取得中...';
-    if (!quizState.quizActive) return 'クイズ開始をお待ちください';
-    if (!quizState.activeQuestion) return '次の問題をお待ちください';
-    if (hasAnsweredCurrentQuestion) return '回答済み - 次の問題をお待ちください';
     if (submitting) return '送信中...';
+    if (!quizState.quizActive) return '問題が表示されたら回答してください';
+    if (!quizState.activeQuestion) return '回答してください';
+    if (hasAnsweredCurrentQuestion) return '回答済み - 次の問題が表示されたら回答してください';
     return `第${quizState.activeQuestion.questionNumber}問 - 回答してください！`;
   };
 
@@ -115,7 +112,7 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
         <Heading size="md" mb={0}>{ "{ re2q }" }</Heading>
       </Box>
 
-      {/* 状態表示 */}
+      {/* 情報表示 */}
       <Box py={6} px={6} textAlign="center" bg="white" boxShadow="sm">
         <Text fontSize="2xl" fontWeight="bold" color="gray.700">
           {getStatusMessage()}
@@ -159,7 +156,7 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
             position="relative"
             overflow="hidden"
             css={
-              isAcceptingAnswers && !hasAnsweredCurrentQuestion && !submitting
+              quizState?.questionActive && !hasAnsweredCurrentQuestion && !submitting
                 ? css`
                     animation: ${pulse} 2s ease-in-out infinite;
                   `
@@ -186,7 +183,7 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
             position="relative"
             overflow="hidden"
             css={
-              isAcceptingAnswers && !hasAnsweredCurrentQuestion && !submitting
+              quizState?.questionActive && !hasAnsweredCurrentQuestion && !submitting
                 ? css`
                     animation: ${pulse} 2s ease-in-out infinite;
                   `
