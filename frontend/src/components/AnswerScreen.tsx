@@ -44,6 +44,7 @@ interface AnswerScreenProps {
   quizState: QuizState | null;
   answers: Answer[];
   onSubmitAnswer: (answer: boolean) => Promise<void>;
+  onCooldownEnd: () => Promise<void>;
   loading?: boolean;
 }
 
@@ -57,6 +58,7 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
   quizState,
   answers,
   onSubmitAnswer,
+  onCooldownEnd,
   loading = false,
 }) => {
   const [submitting, setSubmitting] = useState(false);
@@ -70,8 +72,12 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
         setCooldownRemaining(cooldownRemaining - 1);
       }, 1000);
       return () => clearTimeout(timer);
+    } else if (cooldownRemaining === 0 && lastSubmittedAnswer !== null && !submitting) {
+      // クールダウン終了時にクイズ状態を再取得
+      onCooldownEnd();
+      setLastSubmittedAnswer(null);
     }
-  }, [cooldownRemaining]);
+  }, [cooldownRemaining, lastSubmittedAnswer, onCooldownEnd, submitting]);
 
   const handleSubmit = async (answer: boolean) => {
     if (submitting || loading || !quizState || cooldownRemaining > 0) return;

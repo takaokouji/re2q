@@ -37,7 +37,7 @@ class GraphqlController < ApplicationController
       player = Player.create!(uuid: SecureRandom.uuid)
       cookies.encrypted[:player_uuid] = {
         value: player.uuid,
-        expires: 1.year.from_now,
+        expires: 1.day.from_now,
         httponly: true,
         secure: Rails.env.production?
       }
@@ -49,7 +49,7 @@ class GraphqlController < ApplicationController
         player = Player.create!(uuid: SecureRandom.uuid)
         cookies.encrypted[:player_uuid] = {
           value: player.uuid,
-          expires: 1.year.from_now,
+          expires: 1.day.from_now,
           httponly: true,
           secure: Rails.env.production?
         }

@@ -4,7 +4,7 @@ module Mutations
 
     argument :answer, Boolean, required: true, description: "◯ (true) or ✗ (false)"
 
-    field :my_answers, [ Types::AnswerType ], null: false, description: "回答履歴（現在の回答は含まない）"
+    field :question_id, ID, null: true, description: "回答した質問のGlobalID"
     field :errors, [ String ], null: false
 
     def resolve(answer:)
@@ -30,16 +30,17 @@ module Mutations
       answer_keys << cache_key unless answer_keys.include?(cache_key)
       Rails.cache.write(key_list_key, answer_keys, expires_in: 1.hour)
 
-      # DBから現在の回答履歴を取得（現在の回答は含まない）
-      my_answers = player.answers.includes(:question).order(answered_at: :asc)
+      # 質問のGlobalIDを返す
+      question = Question.find(question_id)
+      global_id = Re2qSchema.id_from_object(question, Types::QuestionType, context)
 
       {
-        my_answers: my_answers,
+        question_id: global_id,
         errors: []
       }
     rescue StandardError => e
       {
-        my_answers: [],
+        question_id: nil,
         errors: [ e.message ]
       }
     end
