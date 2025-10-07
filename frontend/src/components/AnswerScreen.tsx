@@ -96,7 +96,7 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
   };
 
   return (
-    <Box minH="100vh" bg="gray.50" display="flex" flexDirection="column">
+    <Box minH="100vh" width="84vw" bg="gray.50" display="flex" flexDirection="column">
       {/* ヘッダー */}
       <Box
         bg="blue.500"
@@ -113,8 +113,8 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
       </Box>
 
       {/* 情報表示 */}
-      <Box py={6} px={6} textAlign="center" bg="white" boxShadow="sm">
-        <Text fontSize="2xl" fontWeight="bold" color="gray.700">
+      <Box height="14vh" py={6} px={6} textAlign="center" bg="white" boxShadow="sm">
+        <Text fontSize="md" fontWeight="bold" color="gray.700">
           {getStatusMessage()}
         </Text>
         {quizState?.activeQuestion && (
