@@ -6,7 +6,7 @@ class QuizStateManager
       question = Question.find(question_id)
 
       raise "Quiz is not active" unless state.quiz_active?
-      raise "Another question is already active" if state.active_question_id.present?
+      raise "Another question is already active" if state.question_active?
 
       now = Time.current
       ends_at = now + question.duration_seconds.seconds
@@ -15,7 +15,7 @@ class QuizStateManager
       PersistAnswersJob.perform_later(question_id)
 
       state.update!(
-        active_question_id: question_id,
+        question_id:,
         question_started_at: now,
         duration_seconds: question.duration_seconds,
         question_ends_at: ends_at
@@ -27,7 +27,7 @@ class QuizStateManager
     # 質問を強制終了 (Issue #12)
     def stop_question
       state = CurrentQuizState.instance
-      return state unless state.active_question_id.present?
+      return state unless state.question_id.present?
 
       # question_ends_atを現在時刻にすることで、PersistAnswersJobが自動停止
       state.update!(
@@ -65,7 +65,7 @@ class QuizStateManager
     # 現在の質問IDを取得（回答受付時に使用）
     def current_question_id
       state = CurrentQuizState.instance
-      state.accepting_answers? ? state.active_question_id : nil
+      state.accepting_answers? ? state.question_id : nil
     end
   end
 end

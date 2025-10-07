@@ -6,8 +6,9 @@ import { SUBMIT_ANSWER } from './graphql/mutations'
 
 interface Answer {
   id: string;
-  playerId: string;
-  questionId: string;
+  player: {
+    id: string;
+  };
   playerAnswer: boolean;
   answeredAt: string;
   question: {
@@ -19,13 +20,12 @@ interface Answer {
 interface QuizState {
   id: string;
   quizActive: boolean;
-  activeQuestionId: string | null;
   questionStartedAt: string | null;
   questionEndsAt: string | null;
   durationSeconds: number | null;
   questionActive: boolean;
   remainingSeconds: number;
-  activeQuestion: {
+  question: {
     id: string;
     questionNumber: number;
   } | null;

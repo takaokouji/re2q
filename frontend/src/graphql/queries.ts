@@ -6,12 +6,15 @@ export const GET_CURRENT_QUIZ_STATE = gql`
     currentQuizState {
       id
       quizActive
-      activeQuestionId
       questionStartedAt
       questionEndsAt
       durationSeconds
       questionActive
       remainingSeconds
+      question {
+        id
+        questionNumber
+      }
     }
   }
 `;
@@ -22,7 +25,6 @@ export const GET_MY_ANSWERS = gql`
     myAnswers {
       id
       playerId
-      questionId
       playerAnswer
       answeredAt
       question {
@@ -39,21 +41,21 @@ export const GET_QUIZ_DATA = gql`
     currentQuizState {
       id
       quizActive
-      activeQuestionId
       questionStartedAt
       questionEndsAt
       durationSeconds
       questionActive
       remainingSeconds
-      activeQuestion {
+      question {
         id
         questionNumber
       }
     }
     myAnswers {
       id
-      playerId
-      questionId
+      player {
+        id
+      }
       playerAnswer
       answeredAt
       question {

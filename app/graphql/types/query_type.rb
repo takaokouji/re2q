@@ -18,6 +18,12 @@ module Types
       ids.map { |id| context.schema.object_from_id(id, context) }
     end
 
+    field :me, Types::PlayerType, null: true, description: "現在のプレイヤー情報"
+
+    def me
+      context[:current_player]
+    end
+
     # 現在のクイズ状態を取得
     field :current_quiz_state, Types::CurrentQuizStateType, null: false,
       description: "現在のクイズ状態"

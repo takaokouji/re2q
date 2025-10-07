@@ -1,8 +1,7 @@
 module Types
   class AnswerType < Types::BaseObject
     global_id_field :id
-    global_id_field :player_id
-    global_id_field :question_id
+    field :player, Types::PlayerType, null: false
     field :player_answer, Boolean, null: false
     field :answered_at, GraphQL::Types::ISO8601DateTime, null: false
     field :question, Types::QuestionType, null: false

@@ -4,13 +4,12 @@ module Types
 
     global_id_field :id
     field :quiz_active, Boolean, null: false, description: "クイズ全体がアクティブか"
-    global_id_field :active_question_id, description: "現在アクティブな質問ID"
     field :question_started_at, GraphQL::Types::ISO8601DateTime, null: true
     field :question_ends_at, GraphQL::Types::ISO8601DateTime, null: true
     field :duration_seconds, Integer, null: true
     field :question_active, Boolean, null: false, description: "質問が受付中か"
     field :remaining_seconds, Integer, null: false, description: "残り時間（秒）"
-    field :active_question, Types::QuestionType, null: true
+    field :question, Types::QuestionType, null: true
 
     def question_active
       object.question_active?
