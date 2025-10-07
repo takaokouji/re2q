@@ -58,26 +58,24 @@ namespace :quiz do
       state = CurrentQuizState.instance
 
       # Check if previous question has ended
-      if state.active_question_id.present? && state.question_ends_at.present?
-        if Time.current < state.question_ends_at
-          puts "Error: Current question has not ended yet"
-          puts "Current question ends at: #{state.question_ends_at}"
-          puts "Remaining seconds: #{state.remaining_seconds}"
-          exit 1
-        end
+      if state.accepting_answers?
+        puts "Error: Current question has not ended yet"
+        puts "Current question ends at: #{state.question_ends_at}"
+        puts "Remaining seconds: #{state.remaining_seconds}"
+        exit 1
       end
 
       # Determine which question to start
       if position
-        question = Question.find_by(position: position)
+        question = Question.find_by(position:)
         unless question
           puts "Error: Question not found with position #{position}"
           exit 1
         end
       else
         # Auto-determine next question
-        if state.active_question_id.present?
-          current_question = Question.find(state.active_question_id)
+        if state.question_id.present?
+          current_question = Question.find(state.question_id)
           next_position = current_question.position + 1
           question = Question.find_by(position: next_position)
           unless question
@@ -97,7 +95,7 @@ namespace :quiz do
       state = QuizStateManager.start_question(question.id)
       puts "Question started successfully"
       puts "Position: #{question.position}"
-      puts "Active question ID: #{state.active_question_id}"
+      puts "Active question ID: #{state.question_id}"
       puts "Question started at: #{state.question_started_at}"
       puts "Question ends at: #{state.question_ends_at}"
       puts "Duration: #{state.duration_seconds} seconds"
@@ -119,16 +117,16 @@ namespace :quiz do
 
     begin
       ActiveRecord::Base.transaction do
-        Answer.delete_all
-        Player.delete_all
         state = CurrentQuizState.instance
         state.update!(
           quiz_active: false,
-          active_question_id: nil,
+          question_id: nil,
           question_started_at: nil,
           question_ends_at: nil,
           duration_seconds: nil
         )
+        Answer.delete_all
+        Player.delete_all
 
         puts "Quiz reset successfully"
         puts "- Deleted #{Answer.count} answers"
@@ -153,17 +151,17 @@ namespace :quiz do
 
     begin
       ActiveRecord::Base.transaction do
-        Answer.delete_all
-        Player.delete_all
-        Question.delete_all
         state = CurrentQuizState.instance
         state.update!(
           quiz_active: false,
-          active_question_id: nil,
+          question_id: nil,
           question_started_at: nil,
           question_ends_at: nil,
           duration_seconds: nil
         )
+        Answer.delete_all
+        Player.delete_all
+        Question.delete_all
 
         puts "Everything reset successfully"
         puts "- Deleted all questions"

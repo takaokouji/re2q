@@ -11,10 +11,16 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 
+interface Player {
+  id: string;
+  name: string;
+}
+
 interface Answer {
   id: string;
-  playerId: string;
-  questionId: string;
+  player: {
+    id: string;
+  };
   playerAnswer: boolean;
   answeredAt: string;
   question: {
@@ -26,19 +32,19 @@ interface Answer {
 interface QuizState {
   id: string;
   quizActive: boolean;
-  activeQuestionId: string | null;
   questionStartedAt: string | null;
   questionEndsAt: string | null;
   durationSeconds: number | null;
   questionActive: boolean;
   remainingSeconds: number;
-  activeQuestion: {
+  question: {
     id: string;
     questionNumber: number;
   } | null;
 }
 
 interface AnswerScreenProps {
+  me: Player | null;
   quizState: QuizState | null;
   answers: Answer[];
   onSubmitAnswer: (answer: boolean) => Promise<void>;
@@ -48,6 +54,7 @@ interface AnswerScreenProps {
 
 
 export const AnswerScreen: React.FC<AnswerScreenProps> = ({
+  me,
   quizState,
   answers,
   onSubmitAnswer,
@@ -88,9 +95,12 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
     }
   };
 
+  console.log('Rendering AnswerScreen with quizState:', quizState);
+  console.log('Answers:', answers);
+
   // 現在の問題に対して既に回答済みかどうか
-  const hasAnsweredCurrentQuestion = quizState?.activeQuestionId
-    ? answers.some(a => a.questionId === quizState.activeQuestionId)
+  const hasAnsweredCurrentQuestion = quizState?.question
+    ? answers.some(a => a.question.id === quizState.question?.id)
     : false;
 
   // ボタンの無効化判定（通信中、クールダウン中は回答不可）
@@ -100,12 +110,12 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
   const getStatusMessage = () => {
     if (loading) return 'データを読み込み中...';
     if (!quizState) return 'クイズ情報を取得中...';
-    if (submitting) return '送信中...';
-    if (cooldownRemaining > 0) return `少しお待ち下さい\n${cooldownRemaining}秒...`;
+    if (submitting) return '回答中...';
+    if (cooldownRemaining > 0) return `お待ち下さい\n${cooldownRemaining}秒...`;
     if (!quizState.quizActive) return 'クイズ開始までお待ち下さい\n開始されたら回答してください！';
-    if (!quizState.activeQuestion) return '出題までお待ち下さい\n出題されたら回答してください！';
-    if (hasAnsweredCurrentQuestion) return `第${quizState.activeQuestion.questionNumber}問に回答済み\n次の問題が出題されたら回答してください！`;
-    return `第${quizState.activeQuestion.questionNumber}問 - 回答してください！`;
+    if (!quizState.questionActive) return '出題までお待ち下さい\n出題されたら回答してください！';
+    if (hasAnsweredCurrentQuestion) return `第${quizState.question?.questionNumber}問に回答済み。次が\n出題されたら回答してください！`;
+    return `第${quizState.question?.questionNumber}問に回答してください！`;
   };
 
   return (
@@ -122,7 +132,7 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
         _hover={{ bg: 'blue.600' }}
         transition="background-color 0.2s"
       >
-        <Heading size="md" mb={0}>{ "{ re2q }" }</Heading>
+        <Heading size="md" mb={0}>{ `【ID:${me?.name}】` }</Heading>
       </Box>
 
       {/* 情報表示 */}

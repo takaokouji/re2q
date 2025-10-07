@@ -1,5 +1,5 @@
 class CurrentQuizState < ApplicationRecord
-  belongs_to :active_question, class_name: "Question", optional: true
+  belongs_to :question, optional: true
 
   validates :duration_seconds, numericality: { greater_than: 0 }, allow_nil: true
   validate :singleton_record
@@ -9,7 +9,7 @@ class CurrentQuizState < ApplicationRecord
   end
 
   def question_active?
-    return false unless quiz_active? && active_question_id.present?
+    return false unless quiz_active? && question_id.present?
     return false unless question_started_at && question_ends_at
 
     Time.current.between?(question_started_at, question_ends_at)

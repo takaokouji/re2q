@@ -10,10 +10,9 @@ class PersistAnswersJob < ApplicationJob
     question = Question.find(question_id)
 
     # 質問が終了していないかチェック
-    if state.active_question_id != question_id || Time.current >= state.question_ends_at
+    if state.question_id != question_id || !state.accepting_answers?
       # 最後の永続化処理を実行してから終了
       persist_cached_answers(question_id)
-      clear_question_state(state, question_id)
       return
     end
 
@@ -87,18 +86,5 @@ class PersistAnswersJob < ApplicationJob
     # キーリストもクリア
     key_list_key = "answer_keys:#{question_id}"
     Rails.cache.delete(key_list_key)
-  end
-
-  def clear_question_state(state, question_id)
-    # Issue #12: 永続化Job終了後、CurrentQuizState をクリア
-    # active_question_id が現在の question_id と一致する場合のみクリア
-    if state.active_question_id == question_id
-      state.update!(
-        active_question_id: nil,
-        question_started_at: nil,
-        question_ends_at: nil,
-        duration_seconds: nil
-      )
-    end
   end
 end

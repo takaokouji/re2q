@@ -4,10 +4,16 @@ import { AnswerScreen } from './components/AnswerScreen'
 import { GET_QUIZ_DATA } from './graphql/queries'
 import { SUBMIT_ANSWER } from './graphql/mutations'
 
+interface Player {
+  id: string;
+  name: string;
+}
+
 interface Answer {
   id: string;
-  playerId: string;
-  questionId: string;
+  player: {
+    id: string;
+  };
   playerAnswer: boolean;
   answeredAt: string;
   question: {
@@ -19,19 +25,19 @@ interface Answer {
 interface QuizState {
   id: string;
   quizActive: boolean;
-  activeQuestionId: string | null;
   questionStartedAt: string | null;
   questionEndsAt: string | null;
   durationSeconds: number | null;
   questionActive: boolean;
   remainingSeconds: number;
-  activeQuestion: {
+  question: {
     id: string;
     questionNumber: number;
   } | null;
 }
 
 interface QuizData {
+  me: Player | null;
   currentQuizState: QuizState | null;
   myAnswers: Answer[];
 }
@@ -89,6 +95,7 @@ function App() {
 
   return (
     <AnswerScreen
+      me={data?.me || null}
       quizState={data?.currentQuizState || null}
       answers={data?.myAnswers || []}
       onSubmitAnswer={handleSubmitAnswer}

@@ -25,7 +25,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_06_145158) do
   end
 
   create_table "current_quiz_states", force: :cascade do |t|
-    t.integer "active_question_id"
+    t.integer "question_id"
     t.datetime "question_started_at"
     t.integer "duration_seconds"
     t.datetime "question_ends_at"
@@ -46,7 +46,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_06_145158) do
   create_table "questions", force: :cascade do |t|
     t.text "content", null: false
     t.boolean "correct_answer", null: false
-    t.integer "duration_seconds", default: 10, null: false
+    t.integer "duration_seconds", default: 15, null: false
     t.integer "position", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -55,5 +55,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_06_145158) do
 
   add_foreign_key "answers", "players"
   add_foreign_key "answers", "questions"
-  add_foreign_key "current_quiz_states", "questions", column: "active_question_id"
+  add_foreign_key "current_quiz_states", "questions"
 end

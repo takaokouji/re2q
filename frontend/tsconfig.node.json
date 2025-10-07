@@ -10,6 +10,9 @@
       "@/*": ["./src/*"]
     },
 
+    /* Interop Constraints */
+    "forceConsistentCasingInFileNames": true,
+
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
