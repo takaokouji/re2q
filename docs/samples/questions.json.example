@@ -1,0 +1,42 @@
+[
+  {
+    "content": "Ruby is a programming language",
+    "correct_answer": true,
+    "duration_seconds": 10
+  },
+  {
+    "content": "Rails was created in 1995",
+    "correct_answer": false,
+    "duration_seconds": 10
+  },
+  {
+    "content": "SQLite is a relational database",
+    "correct_answer": true,
+    "duration_seconds": 10
+  },
+  {
+    "content": "GraphQL was invented by Facebook",
+    "correct_answer": true,
+    "duration_seconds": 10
+  },
+  {
+    "content": "TypeScript is older than JavaScript",
+    "correct_answer": false,
+    "duration_seconds": 10
+  },
+  {
+    "content": "React is a JavaScript library",
+    "correct_answer": true,
+    "duration_seconds": 10
+  },
+  {
+    "content": "Apollo is only for mobile apps",
+    "correct_answer": false,
+    "duration_seconds": 10
+  },
+  {
+    "content": "Redis is an in-memory data store",
+    "correct_answer": true,
+    "duration_seconds": 10
+  }
+]
