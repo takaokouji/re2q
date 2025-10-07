@@ -1,8 +1,11 @@
 import { useQuery as useApolloQuery, useMutation as useApolloMutation } from '@apollo/client/react'
 import './App.css'
 import { AnswerScreen } from './components/AnswerScreen'
+import { AdminLogin } from './components/AdminLogin'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { GET_QUIZ_DATA } from './graphql/queries'
 import { SUBMIT_ANSWER } from './graphql/mutations'
+import { Box, Text } from '@chakra-ui/react'
 
 interface Player {
   id: string;
@@ -53,7 +56,8 @@ interface SubmitAnswerVariables {
   answer: boolean;
 }
 
-function App() {
+function AppContent() {
+  const { admin, loading: authLoading } = useAuth();
   const { data, loading, error, refetch } = useApolloQuery<QuizData>(GET_QUIZ_DATA);
 
   const [submitAnswerMutation] = useApolloMutation<SubmitAnswerData, SubmitAnswerVariables>(
@@ -84,6 +88,24 @@ function App() {
     }
   };
 
+  if (authLoading) {
+    return <Box p="20px" textAlign="center"><Text>Loading...</Text></Box>;
+  }
+
+  // /admin パスの場合は管理画面を表示
+  if (window.location.pathname === '/admin') {
+    return admin ? (
+      <Box p="20px" textAlign="center">
+        <Text fontSize="2xl" mb="20px">管理ダッシュボード</Text>
+        <Text>ようこそ、{admin.username}さん</Text>
+        <Text mt="10px" color="gray.500">（管理機能は今後実装予定）</Text>
+      </Box>
+    ) : (
+      <AdminLogin />
+    );
+  }
+
+  // 利用者画面
   if (error) {
     return (
       <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -102,6 +124,14 @@ function App() {
       onCooldownEnd={handleCooldownEnd}
       loading={loading && !data}
     />
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

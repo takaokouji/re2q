@@ -15,7 +15,8 @@ class GraphqlController < ApplicationController
 
     context = {
       current_player: player,
-      player_uuid: player.uuid  # 後方互換性のため残す
+      player_uuid: player.uuid,  # 後方互換性のため残す
+      controller: self
     }
 
     result = Re2qSchema.execute(query, variables: variables, context: context, operation_name: operation_name)

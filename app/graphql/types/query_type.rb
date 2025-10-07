@@ -50,5 +50,14 @@ module Types
     def ranking
       RankingCalculator.calculate
     end
+
+    # 現在ログイン中の管理者を取得
+    field :current_admin, Types::AdminType, null: true,
+      description: "現在ログイン中の管理者"
+
+    def current_admin
+      return nil unless context[:controller].session[:admin_id]
+      Admin.find_by(id: context[:controller].session[:admin_id])
+    end
   end
 end
