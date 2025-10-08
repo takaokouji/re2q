@@ -19,5 +19,5 @@ class TestCase
     teardown do
       DatabaseCleaner.clean
     end
-  end
+end
 end
