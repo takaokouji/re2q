@@ -6,7 +6,7 @@ module Mutations
     argument :password, String, required: true
 
     field :admin, Types::AdminType, null: true
-    field :errors, [String], null: false
+    field :errors, [ String ], null: false
 
     def resolve(username:, password:)
       admin = Admin.find_by(username: username)
@@ -15,7 +15,7 @@ module Mutations
         context[:controller].session[:admin_id] = admin.id
         { admin: admin, errors: [] }
       else
-        { admin: nil, errors: ["ユーザー名またはパスワードが正しくありません"] }
+        { admin: nil, errors: [ "ユーザー名またはパスワードが正しくありません" ] }
       end
     end
   end
