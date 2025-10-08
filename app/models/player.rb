@@ -22,9 +22,15 @@ class Player < ApplicationRecord
     "f" => "き"
   }
 
-  def name
-    return nil if uuid.blank?
+  class << self
+    def name_by(uuid:)
+      return nil if uuid.blank?
 
-    @name ||= uuid[0...6].downcase.gsub(/./) { HEX_TO_LABEL[it] }
+      uuid[0...6].downcase.gsub(/./) { HEX_TO_LABEL[it] }
+    end
+  end
+
+  def name
+    @name ||= self.class.name_by(uuid:)
   end
 end

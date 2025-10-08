@@ -87,7 +87,8 @@ export const GET_QUESTIONS = gql`
 export const GET_RANKING = gql`
   query GetRanking {
     ranking {
-      playerUuid
+      playerId
+      playerName
       correctCount
       totalAnswered
       rank

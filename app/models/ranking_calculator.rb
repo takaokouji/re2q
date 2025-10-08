@@ -12,9 +12,10 @@ class RankingCalculator
         .group("players.id", "players.uuid")
         .order("correct_count DESC, total_answered ASC")
         .map do |result|
+          player = Player.new(id: result.player_id, uuid: result.player_uuid)
           {
-            player_id: result.player_id,
-            player_uuid: result.player_uuid,
+            player_id: player.to_gid_param,
+            player_name: player.name,
             correct_count: result.correct_count,
             total_answered: result.total_answered,
             rank: nil  # あとで計算
@@ -32,7 +33,7 @@ class RankingCalculator
         previous_correct_count = entry[:correct_count]
       end
 
-      results.map { |r| OpenStruct.new(r) }
+      results.map { |r| RankingEntry.new(**r) }
     end
   end
 end

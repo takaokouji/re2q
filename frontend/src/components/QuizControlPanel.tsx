@@ -62,9 +62,7 @@ export function QuizControlPanel() {
   const [visibleAnswers, setVisibleAnswers] = useState<Set<string>>(new Set());
   const [isResetAlertOpen, setIsResetAlertOpen] = useState(false);
 
-  const { data: stateData } = useQuery<GetCurrentQuizStateData>(GET_CURRENT_QUIZ_STATE, {
-    pollInterval: 5000,
-  });
+  const { data: stateData, refetch: refetchCurrentQuizStateData } = useQuery<GetCurrentQuizStateData>(GET_CURRENT_QUIZ_STATE);
 
   useEffect(() => {
     if (stateData?.currentQuizState) {
@@ -144,6 +142,8 @@ export function QuizControlPanel() {
         setRemainingSeconds(remainingSeconds - 1);
       }, 1000);
       return () => clearTimeout(timer);
+    } else {
+      refetchCurrentQuizStateData();
     }
   }, [remainingSeconds]);
 
@@ -258,11 +258,6 @@ export function QuizControlPanel() {
         </SimpleGrid>
       )}
 
-      {/* ランキング表示 */}
-      <Box mt="30px">
-        <RankingPanel />
-      </Box>
-
       {/* 危険ゾーン */}
       <Card.Root mt="30px" bg="red.50" borderColor="red.200" borderWidth="1px">
         <Card.Header>
@@ -282,6 +277,11 @@ export function QuizControlPanel() {
           </Text>
         </Card.Body>
       </Card.Root>
+
+      {/* ランキング表示 */}
+      <Box mt="30px">
+        <RankingPanel />
+      </Box>
 
       {/* セッションリセット確認ダイアログ */}
       <Dialog.Root role="alertdialog"
