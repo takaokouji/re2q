@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
 import { START_QUESTION, RESET_ALL_PLAYER_SESSIONS } from '../graphql/mutations';
@@ -61,12 +61,15 @@ export function QuizControlPanel() {
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const [visibleAnswers, setVisibleAnswers] = useState<Set<string>>(new Set());
   const [isResetAlertOpen, setIsResetAlertOpen] = useState(false);
+  const currentQuizStateRef = useRef<HTMLDivElement | null>(null);
 
   const { data: stateData, refetch: refetchCurrentQuizStateData } = useQuery<GetCurrentQuizStateData>(GET_CURRENT_QUIZ_STATE);
 
   useEffect(() => {
     if (stateData?.currentQuizState) {
       setRemainingSeconds(stateData.currentQuizState.remainingSeconds);
+
+      currentQuizStateRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [stateData?.currentQuizState]);
 
@@ -153,7 +156,7 @@ export function QuizControlPanel() {
     <Box maxW="1200px" mx="auto" p="20px">
       <Toaster />
 
-      <Heading size="xl" mb="30px">クイズ制御パネル</Heading>
+      <Heading size="xl" mb="30px" ref={currentQuizStateRef}>クイズ制御パネル</Heading>
 
       {/* CurrentQuizState表示 */}
       <Card.Root mb="30px" bg="blue.50">
