@@ -59,5 +59,14 @@ module Types
       return nil unless context[:controller].session[:admin_id]
       Admin.find_by(id: context[:controller].session[:admin_id])
     end
+
+    # 全質問一覧を取得（管理者用）
+    field :questions, [ Types::QuestionType ], null: false,
+      description: "全質問一覧（管理者用）"
+
+    def questions
+      # TODO: 管理者認証チェック
+      Question.order(:position)
+    end
   end
 end

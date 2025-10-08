@@ -2,6 +2,7 @@ import { useQuery as useApolloQuery, useMutation as useApolloMutation } from '@a
 import './App.css'
 import { AnswerScreen } from './components/AnswerScreen'
 import { AdminLogin } from './components/AdminLogin'
+import { QuizControlPanel } from './components/QuizControlPanel'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { GET_QUIZ_DATA } from './graphql/queries'
 import { SUBMIT_ANSWER } from './graphql/mutations'
@@ -95,11 +96,7 @@ function AppContent() {
   // /admin パスの場合は管理画面を表示
   if (window.location.pathname === '/admin') {
     return admin ? (
-      <Box p="20px" textAlign="center">
-        <Text fontSize="2xl" mb="20px">管理ダッシュボード</Text>
-        <Text>ようこそ、{admin.username}さん</Text>
-        <Text mt="10px" color="gray.500">（管理機能は今後実装予定）</Text>
-      </Box>
+      <QuizControlPanel />
     ) : (
       <AdminLogin />
     );
