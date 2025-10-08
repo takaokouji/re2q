@@ -30,3 +30,25 @@ export const ADMIN_LOGOUT = gql`
     }
   }
 `;
+
+// 質問を開始（管理者用）
+export const START_QUESTION = gql`
+  mutation StartQuestion($questionId: ID!) {
+    startQuestion(input: { questionId: $questionId }) {
+      currentQuizState {
+        id
+        quizActive
+        questionActive
+        questionStartedAt
+        questionEndsAt
+        durationSeconds
+        remainingSeconds
+        question {
+          id
+          questionNumber
+        }
+      }
+      errors
+    }
+  }
+`;

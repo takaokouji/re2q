@@ -69,3 +69,16 @@ export const GET_QUIZ_DATA = gql`
     }
   }
 `;
+
+// 全質問一覧を取得（管理者用）
+export const GET_QUESTIONS = gql`
+  query GetQuestions {
+    questions {
+      id
+      questionNumber
+      content
+      correctAnswer
+      durationSeconds
+    }
+  }
+`;

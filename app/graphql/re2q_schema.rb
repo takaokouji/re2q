@@ -18,9 +18,20 @@ class Re2qSchema < GraphQL::Schema
 
   # Union and Interface Resolution
   def self.resolve_type(abstract_type, obj, ctx)
-    # TODO: Implement this method
-    # to return the correct GraphQL object type for `obj`
-    raise(GraphQL::RequiredImplementationMissingError)
+    case obj
+    when Player
+      Types::PlayerType
+    when Question
+      Types::QuestionType
+    when Answer
+      Types::AnswerType
+    when CurrentQuizState
+      Types::CurrentQuizStateType
+    when Admin
+      Types::AdminType
+    else
+      raise "Unexpected object: #{obj}"
+    end
   end
 
   # Limit the size of incoming queries:
