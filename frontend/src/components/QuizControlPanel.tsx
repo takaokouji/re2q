@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
 import { START_QUESTION, RESET_ALL_PLAYER_SESSIONS } from '../graphql/mutations';
 import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Badge, Dialog, CloseButton, Portal } from '@chakra-ui/react';
 import { Toaster, toaster } from "@/components/ui/toaster";
+
+import { RankingPanel } from './RankingPanel';
 
 // (interface definitions remain the same)
 interface Question {
@@ -60,9 +62,7 @@ export function QuizControlPanel() {
   const [visibleAnswers, setVisibleAnswers] = useState<Set<string>>(new Set());
   const [isResetAlertOpen, setIsResetAlertOpen] = useState(false);
 
-  const { data: stateData } = useQuery<GetCurrentQuizStateData>(GET_CURRENT_QUIZ_STATE, {
-    pollInterval: 5000,
-  });
+  const { data: stateData, refetch: refetchCurrentQuizStateData } = useQuery<GetCurrentQuizStateData>(GET_CURRENT_QUIZ_STATE);
 
   useEffect(() => {
     if (stateData?.currentQuizState) {
@@ -142,6 +142,8 @@ export function QuizControlPanel() {
         setRemainingSeconds(remainingSeconds - 1);
       }, 1000);
       return () => clearTimeout(timer);
+    } else {
+      refetchCurrentQuizStateData();
     }
   }, [remainingSeconds]);
 
@@ -275,6 +277,11 @@ export function QuizControlPanel() {
           </Text>
         </Card.Body>
       </Card.Root>
+
+      {/* ランキング表示 */}
+      <Box mt="30px">
+        <RankingPanel />
+      </Box>
 
       {/* セッションリセット確認ダイアログ */}
       <Dialog.Root role="alertdialog"
