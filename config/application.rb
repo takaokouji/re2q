@@ -35,16 +35,5 @@ module Re2q
 
     # Configure Solid Cache to connect to the cache database
     config.solid_cache.connects_to = { database: { writing: :cache } }
-
-    # CORS configuration for development (frontend on different port)
-    config.middleware.insert_before 0, Rack::Cors do
-      allow do
-        origins "http://localhost:5173", "http://localhost:5174"
-        resource "/graphql",
-          headers: :any,
-          methods: [ :get, :post, :options ],
-          credentials: true
-      end
-    end
   end
 end

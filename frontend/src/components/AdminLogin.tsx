@@ -1,8 +1,18 @@
 import { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { ADMIN_LOGIN } from '../graphql/mutations';
 import { useAuth } from '../contexts/AuthContext';
 import { Box, Input, Button, Stack, Heading, Text } from '@chakra-ui/react';
+
+interface AdminLoginMutation {
+  adminLogin: {
+    admin: {
+      id: string;
+      username: string;
+    } | null;
+    errors: string[];
+  };
+}
 
 export function AdminLogin() {
   const [username, setUsername] = useState('');
@@ -10,19 +20,19 @@ export function AdminLogin() {
   const [errors, setErrors] = useState<string[]>([]);
   const { refetch } = useAuth();
 
-  const [adminLogin, { loading }] = useMutation(ADMIN_LOGIN);
+  const [adminLogin, { loading }] = useMutation<AdminLoginMutation>(ADMIN_LOGIN);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors([]);
 
     try {
-      const result = await adminLogin({
+      const { data }  = await adminLogin({
         variables: { username, password }
       });
 
-      if (result.data?.adminLogin.errors.length > 0) {
-        setErrors(result.data.adminLogin.errors);
+      if (data?.adminLogin?.errors && data?.adminLogin?.errors?.length > 0) {
+        setErrors(data.adminLogin.errors);
       } else {
         await refetch();
       }

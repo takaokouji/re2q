@@ -1,5 +1,6 @@
-import { createContext, useContext, ReactNode } from 'react';
-import { useQuery } from '@apollo/client';
+import { createContext, useContext } from 'react';
+import type { ReactNode } from 'react';
+import { useQuery } from '@apollo/client/react';
 import { gql } from '@apollo/client';
 
 const GET_CURRENT_ADMIN = gql`
@@ -22,10 +23,14 @@ interface AuthContextType {
   refetch: () => void;
 }
 
+interface CurrentAdmin {
+  currentAdmin: Admin | null;
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data, loading, refetch } = useQuery(GET_CURRENT_ADMIN);
+  const { data, loading, refetch } = useQuery<CurrentAdmin>(GET_CURRENT_ADMIN);
 
   return (
     <AuthContext.Provider value={{ admin: data?.currentAdmin || null, loading, refetch }}>
