@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
 import { START_QUESTION, RESET_ALL_PLAYER_SESSIONS } from '../graphql/mutations';
 import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Badge, Dialog, CloseButton, Portal } from '@chakra-ui/react';
 import { Toaster, toaster } from "@/components/ui/toaster";
+
+import { RankingPanel } from './RankingPanel';
 
 // (interface definitions remain the same)
 interface Question {
@@ -255,6 +257,11 @@ export function QuizControlPanel() {
           ))}
         </SimpleGrid>
       )}
+
+      {/* ランキング表示 */}
+      <Box mt="30px">
+        <RankingPanel />
+      </Box>
 
       {/* 危険ゾーン */}
       <Card.Root mt="30px" bg="red.50" borderColor="red.200" borderWidth="1px">
