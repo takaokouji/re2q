@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
 import { START_QUESTION } from '../graphql/mutations';
 import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Badge } from '@chakra-ui/react';
@@ -153,7 +153,8 @@ export function QuizControlPanel() {
                 <Button
                   onClick={() => handleStartQuestion(question.id)}
                   disabled={startLoading || state?.questionActive}
-                  colorScheme="blue"
+                  colorPalette="blue"
+                  bg="colorPalette.solid"
                   size="sm"
                   w="100%"
                 >
