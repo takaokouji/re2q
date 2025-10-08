@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_06_145158) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_07_171334) do
+  create_table "admins", force: :cascade do |t|
+    t.string "username", null: false
+    t.string "password_digest", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["username"], name: "index_admins_on_username", unique: true
+  end
+
   create_table "answers", force: :cascade do |t|
     t.integer "player_id", null: false
     t.integer "question_id", null: false
