@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
 import { START_QUESTION } from '../graphql/mutations';
@@ -45,10 +46,18 @@ interface StartQuestionVariables {
 }
 
 export function QuizControlPanel() {
-  // CurrentQuizStateを3秒ごとにポーリング
+  const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
+
+  // CurrentQuizStateを5秒ごとにポーリング
   const { data: stateData } = useQuery<GetCurrentQuizStateData>(GET_CURRENT_QUIZ_STATE, {
-    pollInterval: 3000,
+    pollInterval: 5000,
   });
+
+  useEffect(() => {
+    if (stateData?.currentQuizState) {
+      setRemainingSeconds(stateData.currentQuizState.remainingSeconds);
+    }
+  }, [stateData?.currentQuizState.remainingSeconds]);
 
   // 質問一覧を取得
   const { data: questionsData, loading: questionsLoading } = useQuery<GetQuestionsData>(GET_QUESTIONS);
@@ -64,6 +73,17 @@ export function QuizControlPanel() {
   const handleStartQuestion = (questionId: string) => {
     startQuestion({ variables: { questionId } });
   };
+
+  console.log('remainingSeconds:', remainingSeconds);
+  useEffect(() => {
+    console.log('remainingSeconds updated:', remainingSeconds);
+    if (remainingSeconds > 0) {
+      const timer = setTimeout(() => {
+        setRemainingSeconds(remainingSeconds - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [remainingSeconds]);
 
   const state = stateData?.currentQuizState;
 
@@ -102,7 +122,7 @@ export function QuizControlPanel() {
             </Box>
             <Box>
               <Text fontWeight="bold" display="inline">残り時間: </Text>
-              <Text display="inline">{state?.remainingSeconds ?? 0}秒</Text>
+              <Text display="inline">{remainingSeconds}秒</Text>
             </Box>
             {state?.questionStartedAt && (
               <Box>
