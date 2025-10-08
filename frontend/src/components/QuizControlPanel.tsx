@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
-import { START_QUESTION } from '../graphql/mutations';
-import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Badge } from '@chakra-ui/react';
+import { START_QUESTION, RESET_ALL_PLAYER_SESSIONS } from '../graphql/mutations';
+import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Badge, Dialog, CloseButton, Portal } from '@chakra-ui/react';
+import { Toaster, toaster } from "@/components/ui/toaster";
 
+// (interface definitions remain the same)
 interface Question {
   id: string;
   questionNumber: number;
@@ -45,11 +47,19 @@ interface StartQuestionVariables {
   questionId: string;
 }
 
+interface ResetSessionsData {
+  resetAllPlayerSessions: {
+    success: boolean;
+    deletedCount: number;
+    errors: string[];
+  };
+}
+
 export function QuizControlPanel() {
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const [visibleAnswers, setVisibleAnswers] = useState<Set<string>>(new Set());
+  const [isResetAlertOpen, setIsResetAlertOpen] = useState(false);
 
-  // CurrentQuizStateを5秒ごとにポーリング
   const { data: stateData } = useQuery<GetCurrentQuizStateData>(GET_CURRENT_QUIZ_STATE, {
     pollInterval: 5000,
   });
@@ -58,12 +68,10 @@ export function QuizControlPanel() {
     if (stateData?.currentQuizState) {
       setRemainingSeconds(stateData.currentQuizState.remainingSeconds);
     }
-  }, [stateData?.currentQuizState.remainingSeconds]);
+  }, [stateData?.currentQuizState]);
 
-  // 質問一覧を取得
   const { data: questionsData, loading: questionsLoading } = useQuery<GetQuestionsData>(GET_QUESTIONS);
 
-  // startQuestion Mutation
   const [startQuestion, { loading: startLoading, error: startError }] = useMutation<
     StartQuestionData,
     StartQuestionVariables
@@ -71,8 +79,49 @@ export function QuizControlPanel() {
     refetchQueries: [{ query: GET_CURRENT_QUIZ_STATE }],
   });
 
+  const [resetAllPlayerSessions, { loading: resetLoading }] = useMutation<ResetSessionsData>(
+    RESET_ALL_PLAYER_SESSIONS,
+    {
+      onCompleted: (data) => {
+        const { success, deletedCount, errors } = data.resetAllPlayerSessions;
+        if (success) {
+          toaster.create({
+            title: '成功',
+            description: `${deletedCount}件のプレイヤーセッションをリセットしました。`,
+            type: 'success',
+            duration: 5000,
+            closable: true,
+          });
+        } else {
+          toaster.create({
+            title: 'エラー',
+            description: `リセットに失敗しました: ${errors.join(', ')}`,
+            type: 'error',
+            duration: 9000,
+            closable: true,
+          });
+        }
+        setIsResetAlertOpen(false);
+      },
+      onError: (error) => {
+        toaster.create({
+          title: 'エラー',
+          description: `リセット中にエラーが発生しました: ${error.message}`,
+          type: 'error',
+          duration: 9000,
+          closable: true,
+        });
+        setIsResetAlertOpen(false);
+      },
+    }
+  );
+
   const handleStartQuestion = (questionId: string) => {
     startQuestion({ variables: { questionId } });
+  };
+
+  const handleResetSessions = () => {
+    resetAllPlayerSessions();
   };
 
   const toggleAnswerVisibility = (questionId: string) => {
@@ -87,9 +136,7 @@ export function QuizControlPanel() {
     });
   };
 
-  console.log('remainingSeconds:', remainingSeconds);
   useEffect(() => {
-    console.log('remainingSeconds updated:', remainingSeconds);
     if (remainingSeconds > 0) {
       const timer = setTimeout(() => {
         setRemainingSeconds(remainingSeconds - 1);
@@ -102,6 +149,8 @@ export function QuizControlPanel() {
 
   return (
     <Box maxW="1200px" mx="auto" p="20px">
+      <Toaster />
+
       <Heading size="xl" mb="30px">クイズ制御パネル</Heading>
 
       {/* CurrentQuizState表示 */}
@@ -206,6 +255,57 @@ export function QuizControlPanel() {
           ))}
         </SimpleGrid>
       )}
+
+      {/* 危険ゾーン */}
+      <Card.Root mt="30px" bg="red.50" borderColor="red.200" borderWidth="1px">
+        <Card.Header>
+          <Heading size="md" color="red.700">危険ゾーン</Heading>
+        </Card.Header>
+        <Card.Body>
+          <Button
+            colorPalette="red"
+            bg="colorPalette.solid"
+            onClick={() => setIsResetAlertOpen(true)}
+            loading={resetLoading}
+          >
+            全プレイヤーセッションをリセット
+          </Button>
+          <Text fontSize="sm" color="gray.600" mt={2}>
+            注意: この操作はすべてのプレイヤーの接続をリセットします。現在のクイズ進行状況には影響しませんが、プレイヤーは再接続が必要になる場合があります。
+          </Text>
+        </Card.Body>
+      </Card.Root>
+
+      {/* セッションリセット確認ダイアログ */}
+      <Dialog.Root role="alertdialog"
+        open={isResetAlertOpen}
+        onExitComplete={() => setIsResetAlertOpen(false)}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header fontSize="lg" fontWeight="bold">
+                <Dialog.Title>セッションリセットの確認</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Body>
+                本当にすべてのプレイヤーセッションをリセットしますか？この操作は元に戻せません。
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Dialog.ActionTrigger asChild>
+                  <Button variant="outline" onClick={() => setIsResetAlertOpen(false)}>キャンセル</Button>
+                </Dialog.ActionTrigger>
+                <Button colorPalette="red" bg="colorPalette.solid" onClick={handleResetSessions} ml={3} loading={resetLoading}>
+                  リセット実行
+                </Button>
+              </Dialog.Footer>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton size="sm" onClick={() => setIsResetAlertOpen(false)} />
+              </Dialog.CloseTrigger>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
     </Box>
   );
 }
