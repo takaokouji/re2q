@@ -47,6 +47,7 @@ interface StartQuestionVariables {
 
 export function QuizControlPanel() {
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
+  const [visibleAnswers, setVisibleAnswers] = useState<Set<string>>(new Set());
 
   // CurrentQuizStateを5秒ごとにポーリング
   const { data: stateData } = useQuery<GetCurrentQuizStateData>(GET_CURRENT_QUIZ_STATE, {
@@ -72,6 +73,18 @@ export function QuizControlPanel() {
 
   const handleStartQuestion = (questionId: string) => {
     startQuestion({ variables: { questionId } });
+  };
+
+  const toggleAnswerVisibility = (questionId: string) => {
+    setVisibleAnswers((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(questionId)) {
+        newSet.delete(questionId);
+      } else {
+        newSet.add(questionId);
+      }
+      return newSet;
+    });
   };
 
   console.log('remainingSeconds:', remainingSeconds);
@@ -164,7 +177,15 @@ export function QuizControlPanel() {
                   <Text fontSize="sm">{question.content}</Text>
                   <Box>
                     <Text fontSize="xs" color="gray.600">
-                      正解: {question.correctAnswer ? '◯' : '✗'} | 制限時間: {question.durationSeconds}秒
+                      <Text
+                        as="span"
+                        cursor="pointer"
+                        onClick={() => toggleAnswerVisibility(question.id)}
+                        textDecoration="underline"
+                      >
+                        正解:
+                      </Text>
+                      {visibleAnswers.has(question.id) && ` ${question.correctAnswer ? '◯' : '✗'}`} | 制限時間: {question.durationSeconds}秒
                     </Text>
                   </Box>
                 </Stack>
