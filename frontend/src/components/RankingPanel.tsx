@@ -17,14 +17,13 @@ interface GetRankingData {
 export function RankingPanel() {
   const { data, loading, error, refetch } = useQuery<GetRankingData>(GET_RANKING);
 
-  if (loading) return <Text>ランキングを読み込み中...</Text>;
   if (error) return <Text>エラー: {error.message}</Text>;
 
   return (
     <Box>
-      <HStack mb="10px">
-        <Heading size="md" mb="20px">ランキング</Heading>
-        <Button variant="surface" onClick={() => refetch()} size="sm">更新</Button>
+      <HStack mb="20px" justifyContent="center">
+        <Heading size="md" mb={0}>ランキング</Heading>
+        <Button variant="surface" onClick={() => refetch()} size="xs" loading={loading}>更新</Button>
       </HStack>
       <Table.Root variant="outline">
         <Table.Header>
