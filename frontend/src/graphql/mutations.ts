@@ -52,3 +52,14 @@ export const START_QUESTION = gql`
     }
   }
 `;
+
+// 全プレイヤーセッションをリセット
+export const RESET_ALL_PLAYER_SESSIONS = gql`
+  mutation ResetAllPlayerSessions {
+    resetAllPlayerSessions(input: {}) {
+      success
+      deletedCount
+      errors
+    }
+  }
+`;

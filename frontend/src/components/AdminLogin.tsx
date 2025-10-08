@@ -36,8 +36,10 @@ export function AdminLogin() {
       } else {
         await refetch();
       }
-    } catch (err) {
-      setErrors(['ログインに失敗しました']);
+    } catch (error) {
+      console.error("Login failed:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
