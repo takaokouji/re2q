@@ -83,8 +83,8 @@ class RankingCalculatorTest < ActiveSupport::TestCase
 
     assert_equal 2, player1_entry.correct_count
     assert_equal 3, player1_entry.total_answered
-    assert_includes [1, 2], player1_entry.rank
-    assert_includes [0, 1], player1_entry.lottery_score
+    assert_includes [ 1, 2 ], player1_entry.rank
+    assert_includes [ 0, 1 ], player1_entry.lottery_score
 
     assert_equal 1, player2_entry.correct_count
     assert_equal 2, player2_entry.total_answered
@@ -93,8 +93,8 @@ class RankingCalculatorTest < ActiveSupport::TestCase
 
     assert_equal 2, player3_entry.correct_count
     assert_equal 3, player3_entry.total_answered
-    assert_includes [1, 2], player3_entry.rank
-    assert_includes [0, 1], player3_entry.lottery_score
+    assert_includes [ 1, 2 ], player3_entry.rank
+    assert_includes [ 0, 1 ], player3_entry.lottery_score
 
     assert_equal 0, player4_entry.correct_count
     assert_equal 1, player4_entry.total_answered
@@ -105,6 +105,6 @@ class RankingCalculatorTest < ActiveSupport::TestCase
     assert_not_equal player1_entry.rank, player3_entry.rank
 
     # Verify that one of Player 1 or Player 3 has lottery_score 1, and the other 0
-    assert_equal 1, [player1_entry.lottery_score, player3_entry.lottery_score].sum
+    assert_equal 1, [ player1_entry.lottery_score, player3_entry.lottery_score ].sum
   end
 end

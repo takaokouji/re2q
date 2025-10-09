@@ -61,9 +61,9 @@ class Mutations::ExecuteLotteryMutationTest < ActiveSupport::TestCase
     assert_equal 2, player3_entry["correctCount"]
 
     # Check that one of them has lottery_score 1 and the other 0
-    assert_equal 1, [player1_entry["lotteryScore"], player3_entry["lotteryScore"]].sum
-    assert_includes [0, 1], player1_entry["lotteryScore"]
-    assert_includes [0, 1], player3_entry["lotteryScore"]
+    assert_equal 1, [ player1_entry["lotteryScore"], player3_entry["lotteryScore"] ].sum
+    assert_includes [ 0, 1 ], player1_entry["lotteryScore"]
+    assert_includes [ 0, 1 ], player3_entry["lotteryScore"]
 
     # Verify ranks are different for tied players after lottery
     assert_not_equal player1_entry["rank"], player3_entry["rank"]

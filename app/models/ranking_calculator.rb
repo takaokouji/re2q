@@ -34,7 +34,7 @@ class RankingCalculator
 
       # Re-sort results to apply lottery tie-breaker
       results.sort_by! do |entry|
-        [-entry[:correct_count], entry[:total_answered], -entry[:lottery_score]]
+        [ -entry[:correct_count], entry[:total_answered], -entry[:lottery_score] ]
       end
 
       # 順位を計算（同点の場合は同順位）
@@ -84,7 +84,7 @@ class RankingCalculator
     end
 
     def find_tied_players(results)
-      results.group_by { |r| [r[:correct_count], r[:total_answered]] }
+      results.group_by { |r| [ r[:correct_count], r[:total_answered] ] }
         .values
         .select { |group| group.size > 1 }
     end
