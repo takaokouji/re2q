@@ -53,6 +53,30 @@ export const START_QUESTION = gql`
   }
 `;
 
+// 次の質問を開始（管理者用）
+export const START_NEXT_QUESTION = gql`
+  mutation StartNextQuestion {
+    startNextQuestion(input: {}) {
+      currentQuizState {
+        id
+        quizActive
+        questionActive
+        questionStartedAt
+        questionEndsAt
+        durationSeconds
+        remainingSeconds
+        question {
+          id
+          questionNumber
+          content
+        }
+      }
+      isLastQuestion
+      errors
+    }
+  }
+`;
+
 // 全プレイヤーセッションをリセット
 export const RESET_ALL_PLAYER_SESSIONS = gql`
   mutation ResetAllPlayerSessions {

@@ -3,6 +3,7 @@
 module Types
   class MutationType < Types::BaseObject
     field :start_question, mutation: Mutations::StartQuestionMutation
+    field :start_next_question, mutation: Mutations::StartNextQuestionMutation
     field :submit_answer, mutation: Mutations::SubmitAnswerMutation
     field :admin_login, mutation: Mutations::AdminLoginMutation
     field :admin_logout, mutation: Mutations::AdminLogoutMutation
