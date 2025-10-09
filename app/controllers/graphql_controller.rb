@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class GraphqlController < ApplicationController
+  include PlayerAuthentication
+
   # CSRF protection exemption for GraphQL API
   # Cookie-based authentication is still functional
   skip_before_action :verify_authenticity_token
@@ -27,38 +29,6 @@ class GraphqlController < ApplicationController
   end
 
   private
-
-  # Cookie から player を取得または作成
-  def find_or_create_player_from_cookie
-    player_uuid = cookies.encrypted[:player_uuid]
-
-    if player_uuid.blank?
-      # 新規 Player を作成
-      player = Player.create!(uuid: SecureRandom.uuid)
-      cookies.encrypted[:player_uuid] = {
-        value: player.uuid,
-        expires: 1.day.from_now,
-        httponly: true,
-        secure: Rails.env.production?,
-        same_site: :lax  # クロスオリジンリクエストでもcookieを送信可能に
-      }
-      player
-    else
-      # 既存の Player を取得（存在しない場合は新規作成）
-      player = Player.find_by(uuid: player_uuid)
-      if player.nil?
-        player = Player.create!(uuid: SecureRandom.uuid)
-        cookies.encrypted[:player_uuid] = {
-          value: player.uuid,
-          expires: 1.day.from_now,
-          httponly: true,
-          secure: Rails.env.production?,
-          same_site: :lax  # クロスオリジンリクエストでもcookieを送信可能に
-        }
-      end
-      player
-    end
-  end
 
   # Handle variables in form data, JSON body, or a blank value
   def prepare_variables(variables_param)
