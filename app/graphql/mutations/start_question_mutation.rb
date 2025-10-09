@@ -8,7 +8,9 @@ module Mutations
     field :errors, [ String ], null: false
 
     def resolve(target_question:)
-      # TODO: 管理者認証チェック
+      unless context[:current_admin]
+        raise GraphQL::ExecutionError, "You must be an admin to perform this action"
+      end
 
       state = QuizStateManager.start_question(target_question.id)
 
