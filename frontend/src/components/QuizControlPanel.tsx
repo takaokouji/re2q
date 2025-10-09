@@ -338,10 +338,11 @@ export function QuizControlPanel() {
         mb="40px"
         minH="70vh"
         borderRadius="20px"
+        colorPalette={state?.quizActive ? 'green' : 'red'}
         bgGradient={
           state?.quizActive
-            ? 'linear(135deg, green.100 0%, green.200 100%)'
-            : 'linear(135deg, red.100 0%, red.200 100%)'
+            ? 'linear(135deg, colorPalette.100 0%, colorPalette.200 100%)'
+            : 'linear(135deg, colorPalette.100 0%, colorPalette.200 100%)'
         }
         position="relative"
         p="40px"
@@ -361,7 +362,8 @@ export function QuizControlPanel() {
             <Text
               fontSize={{ base: '32px', md: '40px', lg: '48px' }}
               fontWeight="black"
-              color="gray.800"
+              colorPalette='gray'
+              color="colorPalette.800"
             >
               第 {state.question.questionNumber} 問
             </Text>
@@ -369,7 +371,8 @@ export function QuizControlPanel() {
             <Text
               fontSize={{ base: '32px', md: '40px', lg: '48px' }}
               fontWeight="black"
-              color="gray.800"
+              colorPalette='gray'
+              color="colorPalette.800"
             >
               クイズ待機中
             </Text>
@@ -380,7 +383,8 @@ export function QuizControlPanel() {
             <Text
               fontSize={{ base: '24px', md: '30px', lg: '36px' }}
               fontWeight="bold"
-              color="gray.900"
+              colorPalette='gray'
+              color="colorPalette.900"
               textAlign="center"
               lineHeight="1.5"
               maxW="90%"
@@ -393,7 +397,8 @@ export function QuizControlPanel() {
           <Text
             fontSize={{ base: '80px', md: '120px', lg: '160px' }}
             fontWeight="black"
-            color={state?.questionActive ? 'green.600' : 'gray.400'}
+            colorPalette={state?.questionActive ? (remainingSeconds > 5 ? 'green' : 'red') : 'gray'}
+            color={state?.questionActive ? 'colorPalette.600' : 'colorPalette.400'}
             textAlign="center"
             lineHeight="1"
           >
@@ -405,12 +410,12 @@ export function QuizControlPanel() {
         <Box position="absolute" bottom="20px" right="30px">
           <Stack gap="5px" alignItems="flex-end">
             {state?.questionStartedAt && (
-              <Text fontSize="12px" color="gray.600">
+              <Text fontSize="12px" colorPalette="gray" color="colorPalette.600">
                 開始: {new Date(state.questionStartedAt).toLocaleTimeString()}
               </Text>
             )}
             {state?.questionEndsAt && (
-              <Text fontSize="12px" color="gray.600">
+              <Text fontSize="12px" colorPalette="gray" color="colorPalette.600">
                 終了: {new Date(state.questionEndsAt).toLocaleTimeString()}
               </Text>
             )}
