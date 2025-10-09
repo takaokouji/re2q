@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
-import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Badge, Dialog, CloseButton, Portal, HStack } from '@chakra-ui/react';
+import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Badge, Dialog, CloseButton, Portal, IconButton, Menu } from '@chakra-ui/react';
 import { Toaster, toaster } from "@/components/ui/toaster";
 
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
@@ -290,19 +290,47 @@ export function QuizControlPanel() {
   const isQuizFinished = !state?.quizActive && !state?.questionActive;
 
   return (
-    <Box maxW="1200px" mx="auto" p="20px">
+    <Box maxW="1200px" mx="auto" p="20px" position="relative">
       <Toaster />
 
-      <HStack justifyContent="center" mb="30px" spaceX={6}>
-        <Heading size="xl" ref={currentQuizStateRef} mb={0}>クイズ制御パネル</Heading>
-        <Button
-          variant="outline"
-          onClick={handleLogout}
-          loading={logoutLoading}
-        >
-          ログアウト
-        </Button>
-      </HStack>
+      {/* 3ドットメニュー */}
+      <Box position="absolute" top="20px" right="20px" zIndex={10}>
+        <Menu.Root>
+          <Menu.Trigger asChild>
+            <IconButton
+              variant="ghost"
+              aria-label="メニュー"
+              size="lg"
+            >
+              ⋮
+            </IconButton>
+          </Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Content>
+              <Box px={4} py={2} fontWeight="bold" color="gray.700">
+                クイズ制御パネル
+              </Box>
+              <Menu.Separator />
+              <Menu.Item
+                value="reset"
+                onClick={() => setIsResetAlertOpen(true)}
+                color="red.600"
+              >
+                全プレイヤーセッションリセット
+              </Menu.Item>
+              <Menu.Item
+                value="logout"
+                onClick={handleLogout}
+                disabled={logoutLoading}
+              >
+                {logoutLoading ? 'ログアウト中...' : 'ログアウト'}
+              </Menu.Item>
+            </Menu.Content>
+          </Menu.Positioner>
+        </Menu.Root>
+      </Box>
+
+      <Box ref={currentQuizStateRef} height="60px" />
 
       {/* クイズ開始ボタン */}
       <Box mb="30px">
@@ -433,27 +461,6 @@ export function QuizControlPanel() {
           ))}
         </SimpleGrid>
       )}
-
-      {/* 危険ゾーン */}
-      <Card.Root mt="30px" bg="red.50" borderColor="red.200" borderWidth="1px">
-        <Card.Header>
-          <Heading size="md" color="red.700">危険ゾーン</Heading>
-        </Card.Header>
-        <Card.Body>
-          <Button
-            colorPalette="red"
-            bg="colorPalette.solid"
-            onClick={() => setIsResetAlertOpen(true)}
-            loading={resetLoading}
-            mb={2}
-          >
-            全プレイヤーセッションをリセット
-          </Button>
-          <Text fontSize="sm" color="gray.600" mb={4}>
-            注意: この操作はすべてのプレイヤーの接続をリセットします。現在のクイズ進行状況には影響しませんが、プレイヤーは再接続が必要になる場合があります。
-          </Text>
-        </Card.Body>
-      </Card.Root>
 
       {/* ランキング表示 */}
       <Box mt="30px">
