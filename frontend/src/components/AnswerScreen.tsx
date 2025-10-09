@@ -124,12 +124,9 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
         py={4}
         px={6}
         boxShadow="md"
-        cursor="pointer"
-        onClick={() => window.open('https://github.com/takaokouji/re2q/', '_blank', 'noopener,noreferrer')}
-        _hover={{ bg: 'blue.600' }}
         transition="background-color 0.2s"
       >
-        <Heading size="md" mb={0}>{ `【ID:${me?.name}】` }</Heading>
+        <Heading size="md" mb={0}>{ `ID【${me?.name}】` }</Heading>
       </Box>
 
       {/* 情報表示 */}

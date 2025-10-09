@@ -4,7 +4,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins "http://localhost:3000", "https://re2q.smalruby.app" # フロントエンドのURL
+    origins "http://localhost:3000", "http://localhost:5173", "https://re2q.smalruby.app" # フロントエンドのURL
 
     resource "/graphql",
       headers: :any,
