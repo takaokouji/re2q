@@ -4,7 +4,7 @@ import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Dialog, CloseButto
 import { Toaster, toaster } from "@/components/ui/toaster";
 
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
-import { START_QUESTION, RESET_ALL_PLAYER_SESSIONS, START_QUIZ, STOP_QUIZ, ADMIN_LOGOUT } from '../graphql/mutations';
+import { START_QUESTION, START_NEXT_QUESTION, RESET_ALL_PLAYER_SESSIONS, START_QUIZ, STOP_QUIZ, ADMIN_LOGOUT } from '../graphql/mutations';
 import { RankingPanel } from './RankingPanel';
 
 // (interface definitions remain the same)
@@ -78,10 +78,19 @@ interface AdminLogoutData {
   };
 }
 
+interface StartNextQuestionData {
+  startNextQuestion: {
+    currentQuizState: QuizState;
+    isLastQuestion: boolean;
+    errors: string[];
+  };
+}
+
 export function QuizControlPanel() {
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const [visibleAnswers, setVisibleAnswers] = useState<Set<string>>(new Set());
   const [isResetAlertOpen, setIsResetAlertOpen] = useState(false);
+  const [isLastQuestion, setIsLastQuestion] = useState<boolean>(false);
   const currentQuizStateRef = useRef<HTMLDivElement | null>(null);
 
   const { data: stateData, refetch: refetchCurrentQuizStateData } = useQuery<GetCurrentQuizStateData>(GET_CURRENT_QUIZ_STATE);
@@ -240,6 +249,43 @@ export function QuizControlPanel() {
     }
   );
 
+  const [startNextQuestion, { loading: startNextLoading }] = useMutation<StartNextQuestionData>(
+    START_NEXT_QUESTION,
+    {
+      onCompleted: (data) => {
+        const { errors, isLastQuestion } = data.startNextQuestion;
+        if (errors && errors.length > 0) {
+          toaster.create({
+            title: 'エラー',
+            description: `次の問題開始に失敗しました: ${errors.join(', ')}`,
+            type: 'error',
+            duration: 9000,
+            closable: true,
+          });
+        } else {
+          setIsLastQuestion(isLastQuestion);
+          toaster.create({
+            title: '成功',
+            description: '次の問題を開始しました。',
+            type: 'success',
+            duration: 5000,
+            closable: true,
+          });
+          refetchCurrentQuizStateData();
+        }
+      },
+      onError: (error) => {
+        toaster.create({
+          title: 'エラー',
+          description: `次の問題開始中にエラーが発生しました: ${error.message}`,
+          type: 'error',
+          duration: 9000,
+          closable: true,
+        });
+      },
+    }
+  );
+
   const handleStartQuestion = (questionId: string) => {
     startQuestion({ variables: { questionId } });
   };
@@ -258,6 +304,10 @@ export function QuizControlPanel() {
 
   const handleLogout = () => {
     adminLogout();
+  };
+
+  const handleStartNextQuestion = () => {
+    startNextQuestion();
   };
 
   const toggleAnswerVisibility = (questionId: string) => {
@@ -424,9 +474,21 @@ export function QuizControlPanel() {
       </Box>
 
       {/* 管理者制御パネル */}
-      {/* クイズ開始/停止ボタン */}
+      {/* クイズ開始/次の問題/停止ボタン */}
       <Box mb="30px">
-        {state?.quizActive ? (
+        {!state?.quizActive ? (
+          <Button
+            colorPalette="green"
+            bg="colorPalette.solid"
+            onClick={handleStartQuiz}
+            loading={startQuizLoading}
+            disabled={startQuizLoading}
+            w="100%"
+            size="lg"
+          >
+            {startQuizLoading ? 'クイズ開始中...' : 'クイズ開始'}
+          </Button>
+        ) : isLastQuestion ? (
           <Button
             colorPalette="red"
             bg="colorPalette.solid"
@@ -440,15 +502,15 @@ export function QuizControlPanel() {
           </Button>
         ) : (
           <Button
-            colorPalette="green"
+            colorPalette="blue"
             bg="colorPalette.solid"
-            onClick={handleStartQuiz}
-            loading={startQuizLoading}
-            disabled={startQuizLoading}
+            onClick={handleStartNextQuestion}
+            loading={startNextLoading}
+            disabled={startNextLoading}
             w="100%"
             size="lg"
           >
-            {startQuizLoading ? 'クイズ開始中...' : 'クイズ開始'}
+            {startNextLoading ? '次の問題を開始中...' : '次の問題'}
           </Button>
         )}
       </Box>
