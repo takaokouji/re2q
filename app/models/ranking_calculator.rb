@@ -6,15 +6,14 @@ class RankingCalculator
       if lottery
         tied_groups = find_tied_players(results)
         tied_groups.each do |group|
-          winner = apply_lottery_tie_breaker(group)
-          group.each do |player_data|
-            player_data[:lottery_score] = (player_data == winner ? 1 : 0)
+          group.shuffle.each.with_index(1) do |player_data, index|
+            player_data[:lottery_score] = index
           end
         end
 
         # Re-sort results to apply lottery tie-breaker
         results.sort_by! do |entry|
-          [ -entry[:correct_count], -entry[:lottery_score] ]
+          [ -entry[:correct_count], entry[:lottery_score] ]
         end
       end
 

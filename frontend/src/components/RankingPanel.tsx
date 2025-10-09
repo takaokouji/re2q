@@ -53,7 +53,7 @@ export const RankingPanel: React.FC<RankingPanelProps> = ({
               <Table.Cell>{entry.playerName}</Table.Cell>
               <Table.Cell>{entry.correctCount}</Table.Cell>
               <Table.Cell>{entry.totalAnswered}</Table.Cell>
-              <Table.Cell>{entry.lotteryScore === 1 ? '🎉' : ''}</Table.Cell>
+              <Table.Cell>{entry.lotteryScore}</Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
