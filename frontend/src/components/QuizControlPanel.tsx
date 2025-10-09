@@ -347,21 +347,19 @@ export function QuizControlPanel() {
         p="40px"
         boxShadow="2xl"
       >
-        {/* 問題文（左上配置） */}
+        {/* 問題番号（左上配置） */}
         {state?.question && (
           <Box
             position="absolute"
             top="30px"
             left="30px"
-            right="30px"
           >
             <Text
-              fontSize={{ base: '16px', md: '18px', lg: '20px' }}
-              fontWeight="medium"
+              fontSize={{ base: '20px', md: '24px', lg: '28px' }}
+              fontWeight="bold"
               color={state?.quizActive ? 'green.800' : 'red.800'}
-              lineHeight="1.6"
             >
-              {state.question.content}
+              第 {state.question.questionNumber} 問
             </Text>
           </Box>
         )}
@@ -373,18 +371,21 @@ export function QuizControlPanel() {
           justifyContent="center"
           alignItems="center"
           minH="70vh"
+          gap="40px"
         >
-          {/* 問題番号 */}
-          <Text
-            fontSize={{ base: '60px', md: '90px', lg: '120px' }}
-            fontWeight="black"
-            color={state?.quizActive ? 'green.800' : 'red.800'}
-            mb="40px"
-            textAlign="center"
-            lineHeight="1.2"
-          >
-            {state?.question ? `第 ${state.question.questionNumber} 問` : 'クイズ待機中'}
-          </Text>
+          {/* 問題文（中央配置） */}
+          {state?.question && (
+            <Text
+              fontSize={{ base: '24px', md: '30px', lg: '36px' }}
+              fontWeight="bold"
+              color={state?.quizActive ? 'green.700' : 'red.700'}
+              textAlign="center"
+              lineHeight="1.5"
+              maxW="90%"
+            >
+              {state.question.content}
+            </Text>
+          )}
 
           {/* 残り時間（数字のみ） */}
           <Text
