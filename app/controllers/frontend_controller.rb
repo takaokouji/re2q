@@ -2,6 +2,6 @@
 
 class FrontendController < ApplicationController
   def show
-    render file: Rails.root.join("public", "frontend", "index.html"), layout: false
+    render file: Rails.root.join("public", "frontend", "frontend-index.html"), layout: false
   end
 end

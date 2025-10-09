@@ -48,6 +48,15 @@ namespace :frontend do
       system("npm", "run", "build")
     end
 
+    # Rename index.html to frontend-index.html to prevent direct browser access
+    # (must be accessed via FrontendController)
+    index_path = "#{Dir.pwd}/public/frontend/index.html"
+    renamed_path = "#{Dir.pwd}/public/frontend/frontend-index.html"
+    if File.exist?(index_path)
+      FileUtils.mv(index_path, renamed_path)
+      puts "Renamed index.html to frontend-index.html"
+    end
+
     puts "✅ React app successfully built and deployed!"
   end
 
