@@ -1,16 +1,14 @@
 module Mutations
-  class StartQuestionMutation < Mutations::BaseMutation
-    description "質問を開始する（管理者用）"
-
-    argument :question_id, ID, required: true, loads: Types::QuestionType, as: :target_question
+  class StopQuizMutation < Mutations::BaseMutation
+    description "クイズを停止する（管理者用）"
 
     field :current_quiz_state, Types::CurrentQuizStateType, null: false
     field :errors, [ String ], null: false
 
-    def resolve(target_question:)
+    def resolve
       require_admin!
 
-      state = QuizStateManager.start_question(target_question.id)
+      state = QuizStateManager.stop_quiz
 
       {
         current_quiz_state: state,

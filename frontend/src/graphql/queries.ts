@@ -85,8 +85,8 @@ export const GET_QUESTIONS = gql`
 
 // ランキングを取得
 export const GET_RANKING = gql`
-  query GetRanking {
-    ranking {
+  query GetRanking($lottery: Boolean) {
+    ranking(lottery: $lottery) {
       playerId
       playerName
       correctCount

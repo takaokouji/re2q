@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
-import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
-import { START_QUESTION, RESET_ALL_PLAYER_SESSIONS, EXECUTE_LOTTERY } from '../graphql/mutations';
-import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Badge, Dialog, CloseButton, Portal } from '@chakra-ui/react';
+import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Badge, Dialog, CloseButton, Portal, HStack } from '@chakra-ui/react';
 import { Toaster, toaster } from "@/components/ui/toaster";
 
+import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
+import { START_QUESTION, RESET_ALL_PLAYER_SESSIONS, START_QUIZ, STOP_QUIZ, ADMIN_LOGOUT } from '../graphql/mutations';
 import { RankingPanel } from './RankingPanel';
 
 // (interface definitions remain the same)
@@ -57,17 +57,23 @@ interface ResetSessionsData {
   };
 }
 
-interface ExecuteLotteryData {
-  executeLottery: {
-    rankingEntries: {
-      player_id: string;
-      player_name: string;
-      correct_count: number;
-      total_answered: number;
-      rank: number;
-      lottery_score: number;
-    }[];
+interface StartQuizData {
+  startQuiz: {
+    currentQuizState: QuizState;
     errors: string[];
+  };
+}
+
+interface StopQuizData {
+  stopQuiz: {
+    currentQuizState: QuizState;
+    errors: string[];
+  };
+}
+
+interface AdminLogoutData {
+  adminLogout: {
+    success: boolean;
   };
 }
 
@@ -133,15 +139,15 @@ export function QuizControlPanel() {
     }
   );
 
-  const [executeLottery, { loading: lotteryLoading }] = useMutation<ExecuteLotteryData>(
-    EXECUTE_LOTTERY,
+  const [startQuiz, { loading: startQuizLoading }] = useMutation<StartQuizData>(
+    START_QUIZ,
     {
       onCompleted: (data) => {
-        const { rankingEntries, errors } = data.executeLottery;
+        const { errors } = data.startQuiz;
         if (errors && errors.length > 0) {
           toaster.create({
             title: 'エラー',
-            description: `抽選実行に失敗しました: ${errors.join(', ')}`,
+            description: `クイズ開始に失敗しました: ${errors.join(', ')}`,
             type: 'error',
             duration: 9000,
             closable: true,
@@ -149,19 +155,82 @@ export function QuizControlPanel() {
         } else {
           toaster.create({
             title: '成功',
-            description: '同点時抽選を実行しました。ランキングが更新されました。',
+            description: 'クイズを開始しました。',
             type: 'success',
             duration: 5000,
             closable: true,
           });
-          // Optionally refetch ranking data if RankingPanel doesn't do it automatically
-          // refetchRankingData(); // Assuming such a function exists or RankingPanel listens to updates
+          refetchCurrentQuizStateData();
         }
       },
       onError: (error) => {
         toaster.create({
           title: 'エラー',
-          description: `抽選実行中にエラーが発生しました: ${error.message}`,
+          description: `クイズ開始中にエラーが発生しました: ${error.message}`,
+          type: 'error',
+          duration: 9000,
+          closable: true,
+        });
+      },
+    }
+  );
+
+  const [stopQuiz, { loading: stopQuizLoading }] = useMutation<StopQuizData>(
+    STOP_QUIZ,
+    {
+      onCompleted: (data) => {
+        const { errors } = data.stopQuiz;
+        if (errors && errors.length > 0) {
+          toaster.create({
+            title: 'エラー',
+            description: `クイズ停止に失敗しました: ${errors.join(', ')}`,
+            type: 'error',
+            duration: 9000,
+            closable: true,
+          });
+        } else {
+          toaster.create({
+            title: '成功',
+            description: 'クイズを停止しました。',
+            type: 'success',
+            duration: 5000,
+            closable: true,
+          });
+          refetchCurrentQuizStateData();
+        }
+      },
+      onError: (error) => {
+        toaster.create({
+          title: 'エラー',
+          description: `クイズ停止中にエラーが発生しました: ${error.message}`,
+          type: 'error',
+          duration: 9000,
+          closable: true,
+        });
+      },
+    }
+  );
+
+  const [adminLogout, { loading: logoutLoading }] = useMutation<AdminLogoutData>(
+    ADMIN_LOGOUT,
+    {
+      onCompleted: async (data) => {
+        if (data.adminLogout.success) {
+          window.location.reload(); // Reload the page after logout
+        } else {
+          toaster.create({
+            title: 'エラー',
+            description: 'ログアウトに失敗しました。',
+            type: 'error',
+            duration: 9000,
+            closable: true,
+          });
+        }
+      },
+      onError: (error) => {
+        toaster.create({
+          title: 'エラー',
+          description: `ログアウト中にエラーが発生しました: ${error.message}`,
           type: 'error',
           duration: 9000,
           closable: true,
@@ -178,8 +247,16 @@ export function QuizControlPanel() {
     resetAllPlayerSessions();
   };
 
-  const handleExecuteLottery = () => {
-    executeLottery();
+  const handleStartQuiz = () => {
+    startQuiz();
+  };
+
+  const handleStopQuiz = () => {
+    stopQuiz();
+  };
+
+  const handleLogout = () => {
+    adminLogout();
   };
 
   const toggleAnswerVisibility = (questionId: string) => {
@@ -201,7 +278,10 @@ export function QuizControlPanel() {
       }, 1000);
       return () => clearTimeout(timer);
     } else {
-      refetchCurrentQuizStateData();
+      const timer = setTimeout(() => {
+        refetchCurrentQuizStateData();
+      }, 2000);
+      return () => clearTimeout(timer);
     }
   }, [remainingSeconds]);
 
@@ -213,7 +293,43 @@ export function QuizControlPanel() {
     <Box maxW="1200px" mx="auto" p="20px">
       <Toaster />
 
-      <Heading size="xl" mb="30px" ref={currentQuizStateRef}>クイズ制御パネル</Heading>
+      <HStack justifyContent="center" mb="30px" spaceX={6}>
+        <Heading size="xl" ref={currentQuizStateRef} mb={0}>クイズ制御パネル</Heading>
+        <Button
+          variant="outline"
+          onClick={handleLogout}
+          loading={logoutLoading}
+        >
+          ログアウト
+        </Button>
+      </HStack>
+
+      {/* クイズ開始ボタン */}
+      <Box mb="30px">
+        {state?.quizActive ? (
+          <Button
+            colorPalette="red"
+            bg="colorPalette.solid"
+            onClick={handleStopQuiz}
+            loading={stopQuizLoading}
+            disabled={stopQuizLoading}
+            w="100%"
+          >
+            {stopQuizLoading ? 'クイズ停止中...' : 'クイズ停止'}
+          </Button>
+        ) : (
+          <Button
+            colorPalette="green"
+            bg="colorPalette.solid"
+            onClick={handleStartQuiz}
+            loading={startQuizLoading}
+            disabled={startQuizLoading}
+            w="100%"
+          >
+            {startQuizLoading ? 'クイズ開始中...' : 'クイズ開始'}
+          </Button>
+        )}
+      </Box>
 
       {/* CurrentQuizState表示 */}
       <Card.Root mb="30px" bg="blue.50">
@@ -225,9 +341,9 @@ export function QuizControlPanel() {
             <Box>
               <Text fontWeight="bold" display="inline">クイズ状態: </Text>
               {state?.quizActive ? (
-                <Badge colorScheme="green">アクティブ</Badge>
+                <Badge colorPalette="green">アクティブ</Badge>
               ) : (
-                <Badge colorScheme="gray">停止中</Badge>
+                <Badge colorPalette="gray">停止中</Badge>
               )}
             </Box>
             <Box>
@@ -239,9 +355,9 @@ export function QuizControlPanel() {
             <Box>
               <Text fontWeight="bold" display="inline">質問状態: </Text>
               {state?.questionActive ? (
-                <Badge colorScheme="green">受付中</Badge>
+                <Badge colorPalette="green">受付中</Badge>
               ) : (
-                <Badge colorScheme="gray">終了</Badge>
+                <Badge colorPalette="gray">終了</Badge>
               )}
             </Box>
             <Box>
@@ -336,26 +452,12 @@ export function QuizControlPanel() {
           <Text fontSize="sm" color="gray.600" mb={4}>
             注意: この操作はすべてのプレイヤーの接続をリセットします。現在のクイズ進行状況には影響しませんが、プレイヤーは再接続が必要になる場合があります。
           </Text>
-
-          <Button
-            colorPalette="orange"
-            bg="colorPalette.solid"
-            onClick={handleExecuteLottery}
-            loading={lotteryLoading}
-            disabled={!isQuizFinished || lotteryLoading}
-            mb={2}
-          >
-            同点時抽選を実行
-          </Button>
-          <Text fontSize="sm" color="gray.600">
-            注意: この操作はクイズ終了後に同点プレイヤーの順位を決定するための抽選を実行します。実行後、ランキングが更新されます。
-          </Text>
         </Card.Body>
       </Card.Root>
 
       {/* ランキング表示 */}
       <Box mt="30px">
-        <RankingPanel />
+        <RankingPanel lottery={isQuizFinished} />
       </Box>
 
       {/* セッションリセット確認ダイアログ */}

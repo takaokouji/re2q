@@ -63,7 +63,7 @@ class Mutations::StartQuestionMutationTest < ActiveSupport::TestCase
 
     errors = result.dig("data", "startQuestion", "errors")
     assert_not_nil errors
-    assert_equal "You must be an admin to perform this action", errors.first
+    assert_equal "管理者認証が必要です", errors.first
     assert_equal CurrentQuizState.instance.to_gid_param, result.dig("data", "startQuestion", "currentQuizState", "id")
   end
 

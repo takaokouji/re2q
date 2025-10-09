@@ -95,9 +95,6 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
     }
   };
 
-  console.log('Rendering AnswerScreen with quizState:', quizState);
-  console.log('Answers:', answers);
-
   // 現在の問題に対して既に回答済みかどうか
   const hasAnsweredCurrentQuestion = quizState?.question
     ? answers.some(a => a.question.id === quizState.question?.id)

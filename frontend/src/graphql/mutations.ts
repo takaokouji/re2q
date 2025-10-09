@@ -64,17 +64,44 @@ export const RESET_ALL_PLAYER_SESSIONS = gql`
   }
 `;
 
-// 同点時抽選を実行（管理者用）
-export const EXECUTE_LOTTERY = gql`
-  mutation ExecuteLottery {
-    executeLottery(input: {}) {
-      rankingEntries {
-        player_id
-        player_name
-        correct_count
-        total_answered
-        rank
-        lottery_score
+// クイズを開始（管理者用）
+export const START_QUIZ = gql`
+  mutation StartQuiz {
+    startQuiz(input: {}) {
+      currentQuizState {
+        id
+        quizActive
+        questionActive
+        questionStartedAt
+        questionEndsAt
+        durationSeconds
+        remainingSeconds
+        question {
+          id
+          questionNumber
+        }
+      }
+      errors
+    }
+  }
+`;
+
+// クイズを停止（管理者用）
+export const STOP_QUIZ = gql`
+  mutation StopQuiz {
+    stopQuiz(input: {}) {
+      currentQuizState {
+        id
+        quizActive
+        questionActive
+        questionStartedAt
+        questionEndsAt
+        durationSeconds
+        remainingSeconds
+        question {
+          id
+          questionNumber
+        }
       }
       errors
     }
