@@ -124,12 +124,9 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
         py={4}
         px={6}
         boxShadow="md"
-        cursor="pointer"
-        onClick={() => window.open('https://github.com/takaokouji/re2q/', '_blank', 'noopener,noreferrer')}
-        _hover={{ bg: 'blue.600' }}
         transition="background-color 0.2s"
       >
-        <Heading size="md" mb={0}>{ `【ID:${me?.name}】` }</Heading>
+        <Heading size="md" mb={0}>{ `ID【${me?.name}】` }</Heading>
       </Box>
 
       {/* 情報表示 */}
@@ -233,6 +230,27 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
             ))}
           </VStack>
         )}
+      </Box>
+
+      {/* フッター */}
+      <Box
+        py={3}
+        textAlign="center"
+        bg="white"
+        borderTop="1px solid"
+        colorPalette="gray"
+        borderColor="colorPalette.200"
+      >
+        <Text
+          fontSize="sm"
+          colorPalette="gray"
+          color="colorPalette.600"
+          cursor="pointer"
+          _hover={{ colorPalette: "blue", color: 'colorPalette.500', textDecoration: 'underline' }}
+          onClick={() => window.open('https://github.com/takaokouji/re2q/', '_blank', 'noopener,noreferrer')}
+        >
+          {'{ re2q }'}
+        </Text>
       </Box>
     </Box>
   );
