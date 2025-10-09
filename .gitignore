@@ -38,6 +38,9 @@
 /public/packs
 /public/packs-test
 
+# Ignore frontend build output.
+/public/frontend
+
 # Ignore node modules.
 /node_modules
 /yarn-error.log
