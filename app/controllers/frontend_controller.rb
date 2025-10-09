@@ -4,7 +4,7 @@ class FrontendController < ApplicationController
   include PlayerAuthentication
 
   # /frontend/admin 以外のアクセス時に Player を認証
-  before_action :authenticate_player_for_non_admin, only: [:show]
+  before_action :authenticate_player_for_non_admin, only: [ :show ]
 
   def show
     render file: Rails.root.join("public", "frontend", "frontend-index.html"), layout: false

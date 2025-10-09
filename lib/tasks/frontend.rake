@@ -18,7 +18,7 @@ namespace :frontend do
   #
   # bin/rails frontend:dev
   desc "Start React Development Server with Hot Module Reloading"
-  task dev: [:npm_install] do
+  task dev: [ :npm_install ] do
     puts "Starting React app development server..."
     Dir.chdir("#{Dir.pwd}/frontend") do
       system("npm", "run", "dev")
@@ -27,7 +27,7 @@ namespace :frontend do
 
   # bin/rails frontend:typecheck
   desc "Check Typescript for the React App"
-  task typecheck: [:npm_install] do
+  task typecheck: [ :npm_install ] do
     puts "Check Typescript for React app..."
     Dir.chdir("#{Dir.pwd}/frontend") do
       system("npm", "run", "typecheck")
@@ -42,7 +42,7 @@ namespace :frontend do
   #
   # bin/rails frontend:build
   desc "Build React App and move to the public folder"
-  task build: [:npm_install] do
+  task build: [ :npm_install ] do
     puts "Building React app..."
     Dir.chdir("#{Dir.pwd}/frontend") do
       system("npm", "run", "build")
@@ -65,7 +65,7 @@ namespace :frontend do
   # This is identical to running bin/rails frontend:build
   # and is provided solely to align better with intent.
   desc "Preview your React App from the Rails development server (typically port 3000)"
-  task preview: [:build]
+  task preview: [ :build ]
 
   # Run bin/rails frontend:clobber to remove the build files.
   # Running bin/rails assets:clobber will also run this task.
@@ -81,5 +81,5 @@ end
 # This means that any normal Rails deployment script which
 # contains rake assets:precompile will also build the
 # React app automatically.
-Rake::Task["assets:precompile"].enhance(["frontend:build"])
-Rake::Task["assets:clobber"].enhance(["frontend:clobber"])
+Rake::Task["assets:precompile"].enhance([ "frontend:build" ])
+Rake::Task["assets:clobber"].enhance([ "frontend:clobber" ])
