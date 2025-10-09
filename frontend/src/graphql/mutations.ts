@@ -80,3 +80,25 @@ export const EXECUTE_LOTTERY = gql`
     }
   }
 `;
+
+// クイズを開始（管理者用）
+export const START_QUIZ = gql`
+  mutation StartQuiz {
+    startQuiz(input: {}) {
+      currentQuizState {
+        id
+        quizActive
+        questionActive
+        questionStartedAt
+        questionEndsAt
+        durationSeconds
+        remainingSeconds
+        question {
+          id
+          questionNumber
+        }
+      }
+      errors
+    }
+  }
+`;

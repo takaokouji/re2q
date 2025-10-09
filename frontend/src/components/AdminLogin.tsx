@@ -38,8 +38,6 @@ export function AdminLogin() {
       }
     } catch (error) {
       console.error("Login failed:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -74,7 +72,8 @@ export function AdminLogin() {
           <Button
             type="submit"
             disabled={loading}
-            colorScheme="blue"
+            colorPalette="blue"
+            bg="colorPalette.solid"
             w="100%"
           >
             {loading ? 'ログイン中...' : 'ログイン'}
