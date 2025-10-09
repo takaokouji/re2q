@@ -14,6 +14,7 @@ export const GET_CURRENT_QUIZ_STATE = gql`
       question {
         id
         questionNumber
+        content
       }
     }
   }

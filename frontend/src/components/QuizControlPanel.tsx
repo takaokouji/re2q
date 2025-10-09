@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
-import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Badge, Dialog, CloseButton, Portal, IconButton, Menu } from '@chakra-ui/react';
+import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Dialog, CloseButton, Portal, IconButton, Menu } from '@chakra-ui/react';
 import { Toaster, toaster } from "@/components/ui/toaster";
 
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
@@ -27,6 +27,7 @@ interface QuizState {
   question: {
     id: string;
     questionNumber: number;
+    content: string;
   } | null;
 }
 
@@ -290,7 +291,7 @@ export function QuizControlPanel() {
   const isQuizFinished = !state?.quizActive && !state?.questionActive;
 
   return (
-    <Box maxW="1200px" mx="auto" p="20px" position="relative">
+    <Box maxW="1400px" mx="auto" p="20px" position="relative">
       <Toaster />
 
       {/* 3ドットメニュー */}
@@ -332,7 +333,82 @@ export function QuizControlPanel() {
 
       <Box ref={currentQuizStateRef} height="60px" />
 
-      {/* クイズ開始ボタン */}
+      {/* 大型スクリーン表示エリア（ポップなデザイン） */}
+      <Box
+        mb="40px"
+        minH="70vh"
+        borderRadius="20px"
+        bgGradient={
+          state?.quizActive
+            ? 'linear(135deg, green.100 0%, green.200 100%)'
+            : 'linear(135deg, red.100 0%, red.200 100%)'
+        }
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        position="relative"
+        p="40px"
+        boxShadow="2xl"
+      >
+        {/* 問題番号 */}
+        <Text
+          fontSize={{ base: '60px', md: '90px', lg: '120px' }}
+          fontWeight="black"
+          color={state?.quizActive ? 'green.800' : 'red.800'}
+          mb="20px"
+          textAlign="center"
+          lineHeight="1.2"
+        >
+          {state?.question ? `第 ${state.question.questionNumber} 問` : 'クイズ待機中'}
+        </Text>
+
+        {/* 問題文 */}
+        {state?.question && (
+          <Text
+            fontSize={{ base: '24px', md: '30px', lg: '36px' }}
+            fontWeight="bold"
+            color={state?.quizActive ? 'green.700' : 'red.700'}
+            mb="40px"
+            textAlign="center"
+            lineHeight="1.5"
+            maxW="90%"
+          >
+            {state.question.content}
+          </Text>
+        )}
+
+        {/* 残り時間 */}
+        <Text
+          fontSize={{ base: '64px', md: '80px', lg: '96px' }}
+          fontWeight="black"
+          color={state?.questionActive ? 'green.600' : 'gray.400'}
+          textAlign="center"
+          lineHeight="1.2"
+          mb="20px"
+        >
+          残り {remainingSeconds} 秒
+        </Text>
+
+        {/* 開始時刻・終了時刻（右下に小さく） */}
+        <Box position="absolute" bottom="20px" right="30px">
+          <Stack gap="5px" alignItems="flex-end">
+            {state?.questionStartedAt && (
+              <Text fontSize="12px" color="gray.600">
+                開始: {new Date(state.questionStartedAt).toLocaleTimeString()}
+              </Text>
+            )}
+            {state?.questionEndsAt && (
+              <Text fontSize="12px" color="gray.600">
+                終了: {new Date(state.questionEndsAt).toLocaleTimeString()}
+              </Text>
+            )}
+          </Stack>
+        </Box>
+      </Box>
+
+      {/* 管理者制御パネル */}
+      {/* クイズ開始/停止ボタン */}
       <Box mb="30px">
         {state?.quizActive ? (
           <Button
@@ -342,6 +418,7 @@ export function QuizControlPanel() {
             loading={stopQuizLoading}
             disabled={stopQuizLoading}
             w="100%"
+            size="lg"
           >
             {stopQuizLoading ? 'クイズ停止中...' : 'クイズ停止'}
           </Button>
@@ -353,60 +430,12 @@ export function QuizControlPanel() {
             loading={startQuizLoading}
             disabled={startQuizLoading}
             w="100%"
+            size="lg"
           >
             {startQuizLoading ? 'クイズ開始中...' : 'クイズ開始'}
           </Button>
         )}
       </Box>
-
-      {/* CurrentQuizState表示 */}
-      <Card.Root mb="30px" bg="blue.50">
-        <Card.Header>
-          <Heading size="md">現在の状態</Heading>
-        </Card.Header>
-        <Card.Body>
-          <Stack gap="10px">
-            <Box>
-              <Text fontWeight="bold" display="inline">クイズ状態: </Text>
-              {state?.quizActive ? (
-                <Badge colorPalette="green">アクティブ</Badge>
-              ) : (
-                <Badge colorPalette="gray">停止中</Badge>
-              )}
-            </Box>
-            <Box>
-              <Text fontWeight="bold" display="inline">現在の質問: </Text>
-              <Text display="inline">
-                {state?.question ? `第${state.question.questionNumber}問` : 'なし'}
-              </Text>
-            </Box>
-            <Box>
-              <Text fontWeight="bold" display="inline">質問状態: </Text>
-              {state?.questionActive ? (
-                <Badge colorPalette="green">受付中</Badge>
-              ) : (
-                <Badge colorPalette="gray">終了</Badge>
-              )}
-            </Box>
-            <Box>
-              <Text fontWeight="bold" display="inline">残り時間: </Text>
-              <Text display="inline">{remainingSeconds}秒</Text>
-            </Box>
-            {state?.questionStartedAt && (
-              <Box>
-                <Text fontWeight="bold" display="inline">開始時刻: </Text>
-                <Text display="inline">{new Date(state.questionStartedAt).toLocaleString()}</Text>
-              </Box>
-            )}
-            {state?.questionEndsAt && (
-              <Box>
-                <Text fontWeight="bold" display="inline">終了時刻: </Text>
-                <Text display="inline">{new Date(state.questionEndsAt).toLocaleString()}</Text>
-              </Box>
-            )}
-          </Stack>
-        </Card.Body>
-      </Card.Root>
 
       {/* エラー表示 */}
       {startError && (
