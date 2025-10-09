@@ -381,7 +381,7 @@ export function QuizControlPanel() {
           {/* 問題文（中央配置） */}
           {state?.question && (
             <Text
-              fontSize={{ base: '24px', md: '30px', lg: '36px' }}
+              fontSize={{ base: '28px', md: '38px', lg: '48px' }}
               fontWeight="bold"
               colorPalette='gray'
               color="colorPalette.900"
