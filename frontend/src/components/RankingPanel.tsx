@@ -15,10 +15,20 @@ interface GetRankingData {
   ranking: RankingEntry[];
 }
 
-export function RankingPanel() {
-  const { data, loading, error, refetch } = useQuery<GetRankingData>(GET_RANKING);
+interface RankingPanelProps {
+  lottery?: boolean;
+}
+
+export const RankingPanel: React.FC<RankingPanelProps> = ({
+  lottery = false
+}) => {
+  const { data, loading, error, refetch } = useQuery<GetRankingData>(GET_RANKING, {
+    variables: { lottery }
+  });
 
   if (error) return <Text>エラー: {error.message}</Text>;
+
+  const ranking = data?.ranking;
 
   return (
     <Box>
@@ -37,7 +47,7 @@ export function RankingPanel() {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {data?.ranking.map((entry) => (
+          {ranking?.map((entry) => (
             <Table.Row key={entry.playerId}>
               <Table.Cell>{entry.rank}</Table.Cell>
               <Table.Cell>{entry.playerName}</Table.Cell>
@@ -50,4 +60,4 @@ export function RankingPanel() {
       </Table.Root>
     </Box>
   );
-}
+};

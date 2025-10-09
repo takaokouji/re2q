@@ -40,15 +40,17 @@ module Types
       player = context[:current_player]
       return [] unless player
 
-      player.answers.includes(:question).order(answered_at: :asc)
+      player.answers.includes(:question).order({ question: { position: :asc }, answered_at: :asc })
     end
 
     # ランキングを取得 (Issue #13)
     field :ranking, [ Types::RankingEntryType ], null: false,
-      description: "現在のランキング（正解数順）"
+      description: "現在のランキング（正解数順）" do
+        argument :lottery, Boolean, required: false, default_value: false, description: "同点の場合に抽選を行うかどうか"
+      end
 
-    def ranking
-      RankingCalculator.calculate
+    def ranking(lottery:)
+      RankingCalculator.calculate(lottery:)
     end
 
     # 現在ログイン中の管理者を取得

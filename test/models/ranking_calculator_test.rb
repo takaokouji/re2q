@@ -69,7 +69,7 @@ class RankingCalculatorTest < ActiveSupport::TestCase
   end
 
   test "calculate_with_lottery should return correct ranking with lottery" do
-    ranking = RankingCalculator.calculate_with_lottery
+    ranking = RankingCalculator.calculate(lottery: true)
 
     # Expected ranks after lottery:
     # Player 1 or Player 3 will be Rank 1, the other Rank 2

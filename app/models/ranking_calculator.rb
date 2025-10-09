@@ -1,57 +1,35 @@
 class RankingCalculator
   class << self
-    def calculate
+    def calculate(lottery: false)
       results = fetch_raw_ranking_data
 
-      # 順位を計算（同点の場合は同順位）
-      current_rank = 1
-      previous_correct_count = nil
-      previous_total_answered = nil
-
-      results.each_with_index do |entry, index|
-        if previous_correct_count != entry[:correct_count] ||
-           previous_total_answered != entry[:total_answered]
-          current_rank = index + 1
+      if lottery
+        tied_groups = find_tied_players(results)
+        tied_groups.each do |group|
+          winner = apply_lottery_tie_breaker(group)
+          group.each do |player_data|
+            player_data[:lottery_score] = (player_data == winner ? 1 : 0)
+          end
         end
-        entry[:rank] = current_rank
-        previous_correct_count = entry[:correct_count]
-        previous_total_answered = entry[:total_answered]
-      end
 
-      results.map { |r| RankingEntry.new(**r) }
-    end
-
-    def calculate_with_lottery
-      results = fetch_raw_ranking_data
-      tied_groups = find_tied_players(results)
-
-      tied_groups.each do |group|
-        winner = apply_lottery_tie_breaker(group)
-        group.each do |player_data|
-          player_data[:lottery_score] = (player_data == winner ? 1 : 0)
+        # Re-sort results to apply lottery tie-breaker
+        results.sort_by! do |entry|
+          [ -entry[:correct_count], -entry[:lottery_score] ]
         end
-      end
-
-      # Re-sort results to apply lottery tie-breaker
-      results.sort_by! do |entry|
-        [ -entry[:correct_count], entry[:total_answered], -entry[:lottery_score] ]
       end
 
       # 順位を計算（同点の場合は同順位）
       current_rank = 1
       previous_correct_count = nil
-      previous_total_answered = nil
       previous_lottery_score = nil
 
       results.each_with_index do |entry, index|
         if previous_correct_count != entry[:correct_count] ||
-           previous_total_answered != entry[:total_answered] ||
            previous_lottery_score != entry[:lottery_score]
           current_rank = index + 1
         end
         entry[:rank] = current_rank
         previous_correct_count = entry[:correct_count]
-        previous_total_answered = entry[:total_answered]
         previous_lottery_score = entry[:lottery_score]
       end
 
@@ -84,7 +62,7 @@ class RankingCalculator
     end
 
     def find_tied_players(results)
-      results.group_by { |r| [ r[:correct_count], r[:total_answered] ] }
+      results.group_by { |r| [ r[:correct_count] ] }
         .values
         .select { |group| group.size > 1 }
     end

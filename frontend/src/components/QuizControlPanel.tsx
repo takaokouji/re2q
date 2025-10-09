@@ -4,7 +4,7 @@ import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Badge, Dialog, Clo
 import { Toaster, toaster } from "@/components/ui/toaster";
 
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
-import { START_QUESTION, RESET_ALL_PLAYER_SESSIONS, EXECUTE_LOTTERY, START_QUIZ, STOP_QUIZ, ADMIN_LOGOUT } from '../graphql/mutations';
+import { START_QUESTION, RESET_ALL_PLAYER_SESSIONS, START_QUIZ, STOP_QUIZ, ADMIN_LOGOUT } from '../graphql/mutations';
 import { RankingPanel } from './RankingPanel';
 
 // (interface definitions remain the same)
@@ -53,20 +53,6 @@ interface ResetSessionsData {
   resetAllPlayerSessions: {
     success: boolean;
     deletedCount: number;
-    errors: string[];
-  };
-}
-
-interface ExecuteLotteryData {
-  executeLottery: {
-    rankingEntries: {
-      player_id: string;
-      player_name: string;
-      correct_count: number;
-      total_answered: number;
-      rank: number;
-      lottery_score: number;
-    }[];
     errors: string[];
   };
 }
@@ -149,43 +135,6 @@ export function QuizControlPanel() {
           closable: true,
         });
         setIsResetAlertOpen(false);
-      },
-    }
-  );
-
-  const [executeLottery, { loading: lotteryLoading }] = useMutation<ExecuteLotteryData>(
-    EXECUTE_LOTTERY,
-    {
-      onCompleted: (data) => {
-        const { errors } = data.executeLottery;
-        if (errors && errors.length > 0) {
-          toaster.create({
-            title: 'エラー',
-            description: `抽選実行に失敗しました: ${errors.join(', ')}`,
-            type: 'error',
-            duration: 9000,
-            closable: true,
-          });
-        } else {
-          toaster.create({
-            title: '成功',
-            description: '同点時抽選を実行しました。ランキングが更新されました。',
-            type: 'success',
-            duration: 5000,
-            closable: true,
-          });
-          // Optionally refetch ranking data if RankingPanel doesn't do it automatically
-          // refetchRankingData(); // Assuming such a function exists or RankingPanel listens to updates
-        }
-      },
-      onError: (error) => {
-        toaster.create({
-          title: 'エラー',
-          description: `抽選実行中にエラーが発生しました: ${error.message}`,
-          type: 'error',
-          duration: 9000,
-          closable: true,
-        });
       },
     }
   );
@@ -298,10 +247,6 @@ export function QuizControlPanel() {
     resetAllPlayerSessions();
   };
 
-  const handleExecuteLottery = () => {
-    executeLottery();
-  };
-
   const handleStartQuiz = () => {
     startQuiz();
   };
@@ -333,7 +278,10 @@ export function QuizControlPanel() {
       }, 1000);
       return () => clearTimeout(timer);
     } else {
-      refetchCurrentQuizStateData();
+      const timer = setTimeout(() => {
+        refetchCurrentQuizStateData();
+      }, 2000);
+      return () => clearTimeout(timer);
     }
   }, [remainingSeconds]);
 
@@ -504,26 +452,12 @@ export function QuizControlPanel() {
           <Text fontSize="sm" color="gray.600" mb={4}>
             注意: この操作はすべてのプレイヤーの接続をリセットします。現在のクイズ進行状況には影響しませんが、プレイヤーは再接続が必要になる場合があります。
           </Text>
-
-          <Button
-            colorPalette="orange"
-            bg="colorPalette.solid"
-            onClick={handleExecuteLottery}
-            loading={lotteryLoading}
-            disabled={!isQuizFinished || lotteryLoading}
-            mb={2}
-          >
-            同点時抽選を実行
-          </Button>
-          <Text fontSize="sm" color="gray.600">
-            注意: この操作はクイズ終了後に同点プレイヤーの順位を決定するための抽選を実行します。実行後、ランキングが更新されます。
-          </Text>
         </Card.Body>
       </Card.Root>
 
       {/* ランキング表示 */}
       <Box mt="30px">
-        <RankingPanel />
+        <RankingPanel lottery={isQuizFinished} />
       </Box>
 
       {/* セッションリセット確認ダイアログ */}
