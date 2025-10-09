@@ -1,4 +1,5 @@
 import { useQuery as useApolloQuery, useMutation as useApolloMutation } from '@apollo/client/react'
+import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import { AnswerScreen } from './components/AnswerScreen'
 import { AdminLogin } from './components/AdminLogin'
@@ -93,34 +94,36 @@ function AppContent() {
     return <Box p="20px" textAlign="center"><Text>Loading...</Text></Box>;
   }
 
-  // /admin パスの場合は管理画面を表示
-  if (window.location.pathname === '/admin') {
-    return admin ? (
-      <QuizControlPanel />
-    ) : (
-      <AdminLogin />
-    );
-  }
-
-  // 利用者画面
-  if (error) {
-    return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <h2>エラーが発生しました</h2>
-        <p>{error.message}</p>
-      </div>
-    );
-  }
-
   return (
-    <AnswerScreen
-      me={data?.me || null}
-      quizState={data?.currentQuizState || null}
-      answers={data?.myAnswers || []}
-      onSubmitAnswer={handleSubmitAnswer}
-      onCooldownEnd={handleCooldownEnd}
-      loading={loading && !data}
-    />
+    <Routes>
+      {/* 管理者画面: /frontend/admin */}
+      <Route
+        path="/admin"
+        element={admin ? <QuizControlPanel /> : <AdminLogin />}
+      />
+
+      {/* 利用者画面: /frontend/ */}
+      <Route
+        path="/"
+        element={
+          error ? (
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <h2>エラーが発生しました</h2>
+              <p>{error.message}</p>
+            </div>
+          ) : (
+            <AnswerScreen
+              me={data?.me || null}
+              quizState={data?.currentQuizState || null}
+              answers={data?.myAnswers || []}
+              onSubmitAnswer={handleSubmitAnswer}
+              onCooldownEnd={handleCooldownEnd}
+              loading={loading && !data}
+            />
+          )
+        }
+      />
+    </Routes>
   );
 }
 
