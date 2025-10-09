@@ -89,8 +89,7 @@ class Mutations::ExecuteLotteryMutationTest < ActiveSupport::TestCase
     context = { current_admin: nil }
     result = Re2qSchema.execute(mutation, context: context)
 
-    assert_not_nil result["errors"]
-    assert_equal "You must be an admin to perform this action", result["errors"].first["message"]
+    assert_equal "管理者認証が必要です", result["errors"].first["message"]
     assert_nil result.dig("data", "executeLottery", "rankingEntries")
   end
 end
