@@ -46,7 +46,7 @@ class QuizStateManager
 
     # クイズ全体を終了
     def stop_quiz
-      stop_question if CurrentQuizState.instance.active_question_id.present?
+      stop_question if CurrentQuizState.instance.question_id.present?
       state = CurrentQuizState.instance
       state.update!(quiz_active: false)
       state

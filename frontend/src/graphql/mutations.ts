@@ -102,3 +102,25 @@ export const START_QUIZ = gql`
     }
   }
 `;
+
+// クイズを停止（管理者用）
+export const STOP_QUIZ = gql`
+  mutation StopQuiz {
+    stopQuiz(input: {}) {
+      currentQuizState {
+        id
+        quizActive
+        questionActive
+        questionStartedAt
+        questionEndsAt
+        durationSeconds
+        remainingSeconds
+        question {
+          id
+          questionNumber
+        }
+      }
+      errors
+    }
+  }
+`;

@@ -9,5 +9,6 @@ module Types
     field :reset_all_player_sessions, mutation: Mutations::ResetAllPlayerSessionsMutation
     field :execute_lottery, mutation: Mutations::ExecuteLotteryMutation
     field :start_quiz, mutation: Mutations::StartQuizMutation
+    field :stop_quiz, mutation: Mutations::StopQuizMutation
   end
 end

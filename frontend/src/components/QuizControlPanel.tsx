@@ -4,7 +4,7 @@ import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Badge, Dialog, Clo
 import { Toaster, toaster } from "@/components/ui/toaster";
 
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
-import { START_QUESTION, RESET_ALL_PLAYER_SESSIONS, EXECUTE_LOTTERY, START_QUIZ, ADMIN_LOGOUT } from '../graphql/mutations';
+import { START_QUESTION, RESET_ALL_PLAYER_SESSIONS, EXECUTE_LOTTERY, START_QUIZ, STOP_QUIZ, ADMIN_LOGOUT } from '../graphql/mutations';
 import { RankingPanel } from './RankingPanel';
 
 // (interface definitions remain the same)
@@ -73,6 +73,13 @@ interface ExecuteLotteryData {
 
 interface StartQuizData {
   startQuiz: {
+    currentQuizState: QuizState;
+    errors: string[];
+  };
+}
+
+interface StopQuizData {
+  stopQuiz: {
     currentQuizState: QuizState;
     errors: string[];
   };
@@ -219,6 +226,42 @@ export function QuizControlPanel() {
     }
   );
 
+  const [stopQuiz, { loading: stopQuizLoading }] = useMutation<StopQuizData>(
+    STOP_QUIZ,
+    {
+      onCompleted: (data) => {
+        const { errors } = data.stopQuiz;
+        if (errors && errors.length > 0) {
+          toaster.create({
+            title: 'エラー',
+            description: `クイズ停止に失敗しました: ${errors.join(', ')}`,
+            type: 'error',
+            duration: 9000,
+            closable: true,
+          });
+        } else {
+          toaster.create({
+            title: '成功',
+            description: 'クイズを停止しました。',
+            type: 'success',
+            duration: 5000,
+            closable: true,
+          });
+          refetchCurrentQuizStateData();
+        }
+      },
+      onError: (error) => {
+        toaster.create({
+          title: 'エラー',
+          description: `クイズ停止中にエラーが発生しました: ${error.message}`,
+          type: 'error',
+          duration: 9000,
+          closable: true,
+        });
+      },
+    }
+  );
+
   const [adminLogout, { loading: logoutLoading }] = useMutation<AdminLogoutData>(
     ADMIN_LOGOUT,
     {
@@ -261,6 +304,10 @@ export function QuizControlPanel() {
 
   const handleStartQuiz = () => {
     startQuiz();
+  };
+
+  const handleStopQuiz = () => {
+    stopQuiz();
   };
 
   const handleLogout = () => {
@@ -311,16 +358,29 @@ export function QuizControlPanel() {
 
       {/* クイズ開始ボタン */}
       <Box mb="30px">
-        <Button
-          colorPalette="green"
-          bg="colorPalette.solid"
-          onClick={handleStartQuiz}
-          loading={startQuizLoading}
-          disabled={state?.quizActive || startQuizLoading}
-          w="100%"
-        >
-          {startQuizLoading ? 'クイズ開始中...' : 'クイズ開始'}
-        </Button>
+        {state?.quizActive ? (
+          <Button
+            colorPalette="red"
+            bg="colorPalette.solid"
+            onClick={handleStopQuiz}
+            loading={stopQuizLoading}
+            disabled={stopQuizLoading}
+            w="100%"
+          >
+            {stopQuizLoading ? 'クイズ停止中...' : 'クイズ停止'}
+          </Button>
+        ) : (
+          <Button
+            colorPalette="green"
+            bg="colorPalette.solid"
+            onClick={handleStartQuiz}
+            loading={startQuizLoading}
+            disabled={startQuizLoading}
+            w="100%"
+          >
+            {startQuizLoading ? 'クイズ開始中...' : 'クイズ開始'}
+          </Button>
+        )}
       </Box>
 
       {/* CurrentQuizState表示 */}
