@@ -1,2 +1,9 @@
-class RankingEntry < Data.define(:player_id, :player_name, :correct_count, :total_answered, :rank)
+class RankingEntry < Data.define(
+  :player_id,
+  :player_name,
+  :correct_count,
+  :total_answered,
+  :rank,
+  :lottery_score
+)
 end

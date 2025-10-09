@@ -92,6 +92,7 @@ export const GET_RANKING = gql`
       correctCount
       totalAnswered
       rank
+      lotteryScore
     }
   }
 `;
