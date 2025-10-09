@@ -5,13 +5,12 @@ service: re2q
 image: takaokouji/re2q
 
 # Deploy to these servers.
-# TODO: Replace with actual AWS EC2 Elastic IP address
 servers:
   web:
-    - REPLACE_WITH_EC2_IP
+    - 57.180.223.131
   # job:
   #   hosts:
-  #     - REPLACE_WITH_EC2_IP
+  #     - 57.180.223.131
   #   cmd: bin/jobs
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
