@@ -75,7 +75,7 @@ class Mutations::StopQuizMutationTest < ActiveSupport::TestCase
       context = { current_admin: @admin }
       result = Re2qSchema.execute(mutation, context: context)
 
-      assert_equal ["QuizStateManager error"], result.dig("data", "stopQuiz", "errors")
+      assert_equal [ "QuizStateManager error" ], result.dig("data", "stopQuiz", "errors")
       assert_not_nil result.dig("data", "stopQuiz", "currentQuizState") # current_quiz_state is returned even on error
     ensure
       QuizStateManager.define_singleton_method(:stop_quiz, original_stop_quiz)
