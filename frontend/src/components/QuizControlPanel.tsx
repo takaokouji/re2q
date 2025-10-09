@@ -494,7 +494,7 @@ export function QuizControlPanel() {
             bg="colorPalette.solid"
             onClick={handleStopQuiz}
             loading={stopQuizLoading}
-            disabled={stopQuizLoading}
+            disabled={stopQuizLoading || state?.questionActive}
             w="100%"
             size="lg"
           >
@@ -506,7 +506,7 @@ export function QuizControlPanel() {
             bg="colorPalette.solid"
             onClick={handleStartNextQuestion}
             loading={startNextLoading}
-            disabled={startNextLoading}
+            disabled={startNextLoading || state?.questionActive}
             w="100%"
             size="lg"
           >
