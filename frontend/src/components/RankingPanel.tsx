@@ -8,6 +8,7 @@ interface RankingEntry {
   correctCount: number;
   totalAnswered: number;
   rank: number;
+  lotteryScore?: number;
 }
 
 interface GetRankingData {
@@ -32,6 +33,7 @@ export function RankingPanel() {
             <Table.ColumnHeader>プレイヤー名</Table.ColumnHeader>
             <Table.ColumnHeader>正解数</Table.ColumnHeader>
             <Table.ColumnHeader>回答数</Table.ColumnHeader>
+            <Table.ColumnHeader>抽選結果</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -41,6 +43,7 @@ export function RankingPanel() {
               <Table.Cell>{entry.playerName}</Table.Cell>
               <Table.Cell>{entry.correctCount}</Table.Cell>
               <Table.Cell>{entry.totalAnswered}</Table.Cell>
+              <Table.Cell>{entry.lotteryScore === 1 ? '🎉' : ''}</Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>

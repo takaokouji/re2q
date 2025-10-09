@@ -1,8 +1,67 @@
 class RankingCalculator
   class << self
     def calculate
-      # Answerテーブルから正解数を集計
-      results = Answer.joins(:question, :player)
+      results = fetch_raw_ranking_data
+
+      # 順位を計算（同点の場合は同順位）
+      current_rank = 1
+      previous_correct_count = nil
+      previous_total_answered = nil
+
+      results.each_with_index do |entry, index|
+        if previous_correct_count != entry[:correct_count] ||
+           previous_total_answered != entry[:total_answered]
+          current_rank = index + 1
+        end
+        entry[:rank] = current_rank
+        previous_correct_count = entry[:correct_count]
+        previous_total_answered = entry[:total_answered]
+      end
+
+      results.map { |r| RankingEntry.new(**r) }
+    end
+
+    def calculate_with_lottery
+      results = fetch_raw_ranking_data
+      tied_groups = find_tied_players(results)
+
+      tied_groups.each do |group|
+        winner = apply_lottery_tie_breaker(group)
+        group.each do |player_data|
+          player_data[:lottery_score] = (player_data == winner ? 1 : 0)
+        end
+      end
+
+      # Re-sort results to apply lottery tie-breaker
+      results.sort_by! do |entry|
+        [ -entry[:correct_count], entry[:total_answered], -entry[:lottery_score] ]
+      end
+
+      # 順位を計算（同点の場合は同順位）
+      current_rank = 1
+      previous_correct_count = nil
+      previous_total_answered = nil
+      previous_lottery_score = nil
+
+      results.each_with_index do |entry, index|
+        if previous_correct_count != entry[:correct_count] ||
+           previous_total_answered != entry[:total_answered] ||
+           previous_lottery_score != entry[:lottery_score]
+          current_rank = index + 1
+        end
+        entry[:rank] = current_rank
+        previous_correct_count = entry[:correct_count]
+        previous_total_answered = entry[:total_answered]
+        previous_lottery_score = entry[:lottery_score]
+      end
+
+      results.map { |r| RankingEntry.new(**r) }
+    end
+
+    private
+
+    def fetch_raw_ranking_data
+      Answer.joins(:question, :player)
         .select(
           "players.id as player_id",
           "players.uuid as player_uuid",
@@ -18,22 +77,20 @@ class RankingCalculator
             player_name: player.name,
             correct_count: result.correct_count,
             total_answered: result.total_answered,
-            rank: nil  # あとで計算
+            rank: nil,  # あとで計算
+            lottery_score: 0 # Initialize lottery score
           }
         end
+    end
 
-      # 順位を計算（同点の場合は同順位）
-      current_rank = 1
-      previous_correct_count = nil
-      results.each_with_index do |entry, index|
-        if previous_correct_count != entry[:correct_count]
-          current_rank = index + 1
-        end
-        entry[:rank] = current_rank
-        previous_correct_count = entry[:correct_count]
-      end
+    def find_tied_players(results)
+      results.group_by { |r| [ r[:correct_count], r[:total_answered] ] }
+        .values
+        .select { |group| group.size > 1 }
+    end
 
-      results.map { |r| RankingEntry.new(**r) }
+    def apply_lottery_tie_breaker(tied_players_group)
+      tied_players_group.sample
     end
   end
 end

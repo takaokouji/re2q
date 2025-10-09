@@ -7,5 +7,6 @@ module Types
     field :correct_count, Integer, null: false, description: "正解数"
     field :total_answered, Integer, null: false, description: "回答数"
     field :rank, Integer, null: true, description: "順位（同点考慮）"
+    field :lottery_score, Integer, null: true, description: "抽選スコア"
   end
 end
