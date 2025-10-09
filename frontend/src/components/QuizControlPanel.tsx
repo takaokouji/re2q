@@ -347,23 +347,6 @@ export function QuizControlPanel() {
         p="40px"
         boxShadow="2xl"
       >
-        {/* 問題番号（左上配置） */}
-        {state?.question && (
-          <Box
-            position="absolute"
-            top="30px"
-            left="30px"
-          >
-            <Text
-              fontSize={{ base: '20px', md: '24px', lg: '28px' }}
-              fontWeight="bold"
-              color={state?.quizActive ? 'green.800' : 'red.800'}
-            >
-              第 {state.question.questionNumber} 問
-            </Text>
-          </Box>
-        )}
-
         {/* 中央エリア */}
         <Box
           display="flex"
@@ -373,12 +356,31 @@ export function QuizControlPanel() {
           minH="70vh"
           gap="40px"
         >
+          {/* 問題番号（中央上部） */}
+          {state?.question ? (
+            <Text
+              fontSize={{ base: '32px', md: '40px', lg: '48px' }}
+              fontWeight="black"
+              color="gray.800"
+            >
+              第 {state.question.questionNumber} 問
+            </Text>
+          ) : (
+            <Text
+              fontSize={{ base: '32px', md: '40px', lg: '48px' }}
+              fontWeight="black"
+              color="gray.800"
+            >
+              クイズ待機中
+            </Text>
+          )}
+
           {/* 問題文（中央配置） */}
           {state?.question && (
             <Text
               fontSize={{ base: '24px', md: '30px', lg: '36px' }}
               fontWeight="bold"
-              color={state?.quizActive ? 'green.700' : 'red.700'}
+              color="gray.900"
               textAlign="center"
               lineHeight="1.5"
               maxW="90%"
