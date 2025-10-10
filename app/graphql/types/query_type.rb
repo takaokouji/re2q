@@ -50,7 +50,13 @@ module Types
       end
 
     def ranking(lottery:)
-      RankingCalculator.calculate(lottery:)
+      # 永続化されたランキングがあればそれを返す
+      if FinalRanking.exists?
+        FinalRanking.ranked.map(&:to_ranking_entry)
+      else
+        # なければ計算結果を返す
+        RankingCalculator.calculate(lottery:)
+      end
     end
 
     # 現在ログイン中の管理者を取得

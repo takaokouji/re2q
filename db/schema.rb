@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_07_171334) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_10_101240) do
   create_table "admins", force: :cascade do |t|
     t.string "username", null: false
     t.string "password_digest", null: false
@@ -44,6 +44,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_07_171334) do
     t.index ["id"], name: "index_current_quiz_states_on_id", unique: true
   end
 
+  create_table "final_rankings", force: :cascade do |t|
+    t.integer "player_id", null: false
+    t.integer "rank", null: false
+    t.integer "correct_count", default: 0, null: false
+    t.integer "total_answered", default: 0, null: false
+    t.integer "lottery_score", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["player_id"], name: "index_final_rankings_on_player_id"
+  end
+
   create_table "players", force: :cascade do |t|
     t.string "uuid", null: false
     t.datetime "created_at", null: false
@@ -64,4 +75,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_07_171334) do
   add_foreign_key "answers", "players"
   add_foreign_key "answers", "questions"
   add_foreign_key "current_quiz_states", "questions"
+  add_foreign_key "final_rankings", "players"
 end

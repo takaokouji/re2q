@@ -75,4 +75,34 @@ class Mutations::ResetQuizMutationTest < ActiveSupport::TestCase
     assert_equal "管理者認証が必要です", errors.first
     assert_equal false, result.dig("data", "resetQuiz", "success")
   end
+
+  test "should delete final rankings when quiz is reset" do
+    # Create final rankings
+    player1 = create(:player)
+    player2 = create(:player)
+    FinalRanking.create!(player: player1, rank: 1, correct_count: 5, total_answered: 8, lottery_score: 0)
+    FinalRanking.create!(player: player2, rank: 2, correct_count: 3, total_answered: 8, lottery_score: 0)
+
+    assert_equal 2, FinalRanking.count
+
+    mutation = <<~GRAPHQL
+      mutation {
+        resetQuiz(input: {}) {
+          success
+          deletedAnswersCount
+          deletedPlayersCount
+          errors
+        }
+      }
+    GRAPHQL
+
+    context = { current_admin: @admin }
+    result = Re2qSchema.execute(mutation, context: context)
+
+    assert_equal true, result.dig("data", "resetQuiz", "success")
+    assert_empty result.dig("data", "resetQuiz", "errors")
+
+    # FinalRanking が削除されていることを確認
+    assert_equal 0, FinalRanking.count
+  end
 end

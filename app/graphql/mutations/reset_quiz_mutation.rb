@@ -27,6 +27,9 @@ module Mutations
           duration_seconds: nil
         )
 
+        # Delete all final rankings
+        FinalRanking.clear_all
+
         # Delete all answers and players
         Answer.delete_all
         Player.delete_all
