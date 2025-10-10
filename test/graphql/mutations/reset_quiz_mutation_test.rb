@@ -75,5 +75,4 @@ class Mutations::ResetQuizMutationTest < ActiveSupport::TestCase
     assert_equal "管理者認証が必要です", errors.first
     assert_equal false, result.dig("data", "resetQuiz", "success")
   end
-
 end
