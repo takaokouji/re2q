@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
-import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Dialog, CloseButton, Portal, IconButton, Menu } from '@chakra-ui/react';
+import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Dialog, CloseButton, Portal, IconButton, Menu, QrCode } from '@chakra-ui/react';
 import { Toaster, toaster } from "@/components/ui/toaster";
 
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
@@ -103,6 +103,14 @@ export function QuizControlPanel() {
   const [isResetQuizAlertOpen, setIsResetQuizAlertOpen] = useState(false);
   const [isLastQuestion, setIsLastQuestion] = useState<boolean>(false);
   const currentQuizStateRef = useRef<HTMLDivElement | null>(null);
+
+  // QRコード用のURL取得
+  const getPlayerUrl = () => {
+    if (import.meta.env.PROD) {
+      return window.location.origin;
+    }
+    return 'http://localhost:5173/';
+  };
 
   const { data: stateData, refetch: refetchCurrentQuizStateData } = useQuery<GetCurrentQuizStateData>(GET_CURRENT_QUIZ_STATE);
 
@@ -505,6 +513,15 @@ export function QuizControlPanel() {
           >
             {remainingSeconds}
           </Text>
+        </Box>
+
+        {/* QRコード（左下） */}
+        <Box position="absolute" bottom="20px" left="30px">
+          <QrCode.Root value={getPlayerUrl()} size={{ base: 'md', md: 'lg', lg: 'xl' }}>
+            <QrCode.Frame>
+              <QrCode.Pattern />
+            </QrCode.Frame>
+          </QrCode.Root>
         </Box>
 
         {/* 開始時刻・終了時刻（右下に小さく） */}
