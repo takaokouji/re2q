@@ -98,10 +98,11 @@ export const RankingPanel: React.FC<RankingPanelProps> = ({
                       color={isRevealed ? rankColor : 'inherit'}
                       fontSize={isRevealed ? '2xl' : 'md'}
                       fontWeight={isRevealed ? 'bold' : 'normal'}
+                      textShadow="0 0 2px gray"
                       transition="all 0.3s ease"
                       _hover={{ opacity: 0.7 }}
                     >
-                      {isRevealed ? entry.playerName : '???'}
+                      {isRevealed ? entry.playerName : '??????'}
                     </Text>
                   ) : (
                     entry.playerName
