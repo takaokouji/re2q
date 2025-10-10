@@ -517,7 +517,7 @@ export function QuizControlPanel() {
 
         {/* QRコード（左下） */}
         <Box position="absolute" bottom="20px" left="30px">
-          <QrCode.Root value={getPlayerUrl()} size={{ base: 'md', md: 'lg', lg: 'xl' }}>
+          <QrCode.Root value={getPlayerUrl()} size={{ base: 'lg', md: 'xl', lg: '2xl' }}>
             <QrCode.Frame>
               <QrCode.Pattern />
             </QrCode.Frame>
