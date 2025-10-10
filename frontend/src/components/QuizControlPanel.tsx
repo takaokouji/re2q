@@ -449,8 +449,9 @@ export function QuizControlPanel() {
         borderRadius="20px"
         colorPalette={state?.quizActive ? 'green' : 'red'}
         bgGradient="to-br"
-        gradientFrom="colorPalette.100"
-        gradientTo="colorPalette.200"
+        gradientFrom="colorPalette.200"
+        gradientVia="white"
+        gradientTo="white"
         position="relative"
         p="40px"
         boxShadow="2xl"
