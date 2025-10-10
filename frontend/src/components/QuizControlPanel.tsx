@@ -6,6 +6,8 @@ import { Toaster, toaster } from "@/components/ui/toaster";
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
 import { START_QUESTION, START_NEXT_QUESTION, RESET_ALL_PLAYER_SESSIONS, START_QUIZ, STOP_QUIZ, ADMIN_LOGOUT, RESET_QUIZ } from '../graphql/mutations';
 import { RankingPanel } from './RankingPanel';
+import startQuestionSound from '@/assets/sounds/start_question.mp3';
+import countdown10Sound from '@/assets/sounds/countdown10.mp3';
 
 // (interface definitions remain the same)
 interface Question {
@@ -103,6 +105,14 @@ export function QuizControlPanel() {
   const [isResetQuizAlertOpen, setIsResetQuizAlertOpen] = useState(false);
   const [isLastQuestion, setIsLastQuestion] = useState<boolean>(false);
   const currentQuizStateRef = useRef<HTMLDivElement | null>(null);
+  const startQuestionAudioRef = useRef<HTMLAudioElement | null>(null);
+  const countdown10AudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // 音声オブジェクトの初期化
+  useEffect(() => {
+    startQuestionAudioRef.current = new Audio(startQuestionSound);
+    countdown10AudioRef.current = new Audio(countdown10Sound);
+  }, []);
 
   // QRコード用のURL取得
   const getPlayerUrl = () => {
@@ -319,6 +329,8 @@ export function QuizControlPanel() {
             duration: 5000
           });
           refetchCurrentQuizStateData();
+          // 音声再生
+          startQuestionAudioRef.current?.play().catch(e => console.error('Audio play failed:', e));
         }
       },
       onError: (error) => {
@@ -374,6 +386,10 @@ export function QuizControlPanel() {
 
   useEffect(() => {
     if (remainingSeconds > 0) {
+      if (remainingSeconds === 8) {
+        countdown10AudioRef.current?.play().catch(e => console.error('Audio play failed:', e));
+      }
+
       const timer = setTimeout(() => {
         setRemainingSeconds(remainingSeconds - 1);
       }, 1000);
@@ -590,7 +606,7 @@ export function QuizControlPanel() {
       )}
 
       {/* 質問一覧 */}
-      <Heading size="md" mb="20px">質問一覧</Heading>
+      <Heading size="md" mt="20vh" mb="20px">質問一覧</Heading>
       {questionsLoading ? (
         <Text>読み込み中...</Text>
       ) : (
