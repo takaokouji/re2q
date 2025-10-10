@@ -8,6 +8,7 @@ module Types
     field :admin_login, mutation: Mutations::AdminLoginMutation
     field :admin_logout, mutation: Mutations::AdminLogoutMutation
     field :reset_all_player_sessions, mutation: Mutations::ResetAllPlayerSessionsMutation
+    field :reset_quiz, mutation: Mutations::ResetQuizMutation
     field :start_quiz, mutation: Mutations::StartQuizMutation
     field :stop_quiz, mutation: Mutations::StopQuizMutation
   end

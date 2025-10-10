@@ -15,6 +15,7 @@ export const GET_CURRENT_QUIZ_STATE = gql`
         id
         questionNumber
         content
+        isLast
       }
     }
   }
@@ -54,6 +55,7 @@ export const GET_QUIZ_DATA = gql`
       question {
         id
         questionNumber
+        isLast
       }
     }
     myAnswers {
