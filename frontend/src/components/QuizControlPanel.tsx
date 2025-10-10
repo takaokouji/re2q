@@ -122,16 +122,14 @@ export function QuizControlPanel() {
             title: '成功',
             description: `${deletedCount}件のプレイヤーセッションをリセットしました。`,
             type: 'success',
-            duration: 5000,
-            closable: true,
+            duration: 5000
           });
         } else {
           toaster.create({
             title: 'エラー',
             description: `リセットに失敗しました: ${errors.join(', ')}`,
             type: 'error',
-            duration: 9000,
-            closable: true,
+            duration: 9000
           });
         }
         setIsResetAlertOpen(false);
@@ -141,8 +139,7 @@ export function QuizControlPanel() {
           title: 'エラー',
           description: `リセット中にエラーが発生しました: ${error.message}`,
           type: 'error',
-          duration: 9000,
-          closable: true,
+          duration: 9000
         });
         setIsResetAlertOpen(false);
       },
@@ -159,16 +156,14 @@ export function QuizControlPanel() {
             title: 'エラー',
             description: `クイズ開始に失敗しました: ${errors.join(', ')}`,
             type: 'error',
-            duration: 9000,
-            closable: true,
+            duration: 9000
           });
         } else {
           toaster.create({
             title: '成功',
             description: 'クイズを開始しました。',
             type: 'success',
-            duration: 5000,
-            closable: true,
+            duration: 5000
           });
           refetchCurrentQuizStateData();
         }
@@ -178,8 +173,7 @@ export function QuizControlPanel() {
           title: 'エラー',
           description: `クイズ開始中にエラーが発生しました: ${error.message}`,
           type: 'error',
-          duration: 9000,
-          closable: true,
+          duration: 9000
         });
       },
     }
@@ -195,16 +189,14 @@ export function QuizControlPanel() {
             title: 'エラー',
             description: `クイズ停止に失敗しました: ${errors.join(', ')}`,
             type: 'error',
-            duration: 9000,
-            closable: true,
+            duration: 9000
           });
         } else {
           toaster.create({
             title: '成功',
             description: 'クイズを停止しました。',
             type: 'success',
-            duration: 5000,
-            closable: true,
+            duration: 5000
           });
           refetchCurrentQuizStateData();
         }
@@ -214,8 +206,7 @@ export function QuizControlPanel() {
           title: 'エラー',
           description: `クイズ停止中にエラーが発生しました: ${error.message}`,
           type: 'error',
-          duration: 9000,
-          closable: true,
+          duration: 9000
         });
       },
     }
@@ -232,8 +223,7 @@ export function QuizControlPanel() {
             title: 'エラー',
             description: 'ログアウトに失敗しました。',
             type: 'error',
-            duration: 9000,
-            closable: true,
+            duration: 9000
           });
         }
       },
@@ -242,8 +232,7 @@ export function QuizControlPanel() {
           title: 'エラー',
           description: `ログアウト中にエラーが発生しました: ${error.message}`,
           type: 'error',
-          duration: 9000,
-          closable: true,
+          duration: 9000
         });
       },
     }
@@ -259,8 +248,7 @@ export function QuizControlPanel() {
             title: 'エラー',
             description: `次の問題開始に失敗しました: ${errors.join(', ')}`,
             type: 'error',
-            duration: 9000,
-            closable: true,
+            duration: 9000
           });
         } else {
           setIsLastQuestion(isLastQuestion);
@@ -268,8 +256,7 @@ export function QuizControlPanel() {
             title: '成功',
             description: '次の問題を開始しました。',
             type: 'success',
-            duration: 5000,
-            closable: true,
+            duration: 5000
           });
           refetchCurrentQuizStateData();
         }
@@ -279,8 +266,7 @@ export function QuizControlPanel() {
           title: 'エラー',
           description: `次の問題開始中にエラーが発生しました: ${error.message}`,
           type: 'error',
-          duration: 9000,
-          closable: true,
+          duration: 9000
         });
       },
     }
@@ -365,7 +351,8 @@ export function QuizControlPanel() {
               <Menu.Item
                 value="reset"
                 onClick={() => setIsResetAlertOpen(true)}
-                color="red.600"
+                colorPalette="red"
+                color="colorPalette.600"
               >
                 全プレイヤーセッションリセット
               </Menu.Item>
@@ -517,9 +504,9 @@ export function QuizControlPanel() {
 
       {/* エラー表示 */}
       {startError && (
-        <Box mb="20px" p="15px" bg="red.100" borderRadius="md">
-          <Text color="red.700" fontWeight="bold">エラー:</Text>
-          <Text color="red.700">{startError.message}</Text>
+        <Box mb="20px" p="15px" colorPalette="red" bg="colorPalette.100" borderRadius="md">
+          <Text colorPalette="red" color="colorPalette.700" fontWeight="bold">エラー:</Text>
+          <Text colorPalette="red" color="colorPalette.700">{startError.message}</Text>
         </Box>
       )}
 

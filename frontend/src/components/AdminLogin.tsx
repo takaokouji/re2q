@@ -65,7 +65,7 @@ export function AdminLogin() {
             />
           </Box>
           {errors.length > 0 && (
-            <Box color="red.500">
+            <Box colorPalette="red" color="colorPalette.500">
               {errors.map((err, i) => <Text key={i}>{err}</Text>)}
             </Box>
           )}
