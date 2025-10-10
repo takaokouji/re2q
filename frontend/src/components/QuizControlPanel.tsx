@@ -440,10 +440,9 @@ export function QuizControlPanel() {
         </Menu.Root>
       </Box>
 
-      <Box ref={currentQuizStateRef} height="60px" />
-
       {/* 大型スクリーン表示エリア（ポップなデザイン） */}
       <Box
+        ref={currentQuizStateRef}
         mb="40px"
         minH="70vh"
         borderRadius="20px"
