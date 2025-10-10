@@ -4,7 +4,7 @@ import { Box, Button, Heading, Text, Stack, SimpleGrid, Card, Dialog, CloseButto
 import { Toaster, toaster } from "@/components/ui/toaster";
 
 import { GET_CURRENT_QUIZ_STATE, GET_QUESTIONS } from '../graphql/queries';
-import { START_QUESTION, START_NEXT_QUESTION, RESET_ALL_PLAYER_SESSIONS, START_QUIZ, STOP_QUIZ, ADMIN_LOGOUT } from '../graphql/mutations';
+import { START_QUESTION, START_NEXT_QUESTION, RESET_ALL_PLAYER_SESSIONS, START_QUIZ, STOP_QUIZ, ADMIN_LOGOUT, RESET_QUIZ } from '../graphql/mutations';
 import { RankingPanel } from './RankingPanel';
 
 // (interface definitions remain the same)
@@ -28,6 +28,7 @@ interface QuizState {
     id: string;
     questionNumber: number;
     content: string;
+    isLast: boolean;
   } | null;
 }
 
@@ -78,6 +79,15 @@ interface AdminLogoutData {
   };
 }
 
+interface ResetQuizData {
+  resetQuiz: {
+    success: boolean;
+    deletedAnswersCount: number;
+    deletedPlayersCount: number;
+    errors: string[];
+  };
+}
+
 interface StartNextQuestionData {
   startNextQuestion: {
     currentQuizState: QuizState;
@@ -90,6 +100,7 @@ export function QuizControlPanel() {
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const [visibleAnswers, setVisibleAnswers] = useState<Set<string>>(new Set());
   const [isResetAlertOpen, setIsResetAlertOpen] = useState(false);
+  const [isResetQuizAlertOpen, setIsResetQuizAlertOpen] = useState(false);
   const [isLastQuestion, setIsLastQuestion] = useState<boolean>(false);
   const currentQuizStateRef = useRef<HTMLDivElement | null>(null);
 
@@ -98,6 +109,11 @@ export function QuizControlPanel() {
   useEffect(() => {
     if (stateData?.currentQuizState) {
       setRemainingSeconds(stateData.currentQuizState.remainingSeconds);
+
+      // 最後の問題かどうかを更新
+      if (stateData.currentQuizState.question?.isLast) {
+        setIsLastQuestion(true);
+      }
 
       currentQuizStateRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
@@ -238,6 +254,42 @@ export function QuizControlPanel() {
     }
   );
 
+  const [resetQuiz, { loading: resetQuizLoading }] = useMutation<ResetQuizData>(
+    RESET_QUIZ,
+    {
+      onCompleted: (data) => {
+        const { success, deletedAnswersCount, deletedPlayersCount, errors } = data.resetQuiz;
+        if (success) {
+          toaster.create({
+            title: '成功',
+            description: `クイズをリセットしました。（回答: ${deletedAnswersCount}件、プレイヤー: ${deletedPlayersCount}件を削除）`,
+            type: 'success',
+            duration: 5000
+          });
+          refetchCurrentQuizStateData();
+          setIsLastQuestion(false);
+        } else {
+          toaster.create({
+            title: 'エラー',
+            description: `クイズリセットに失敗しました: ${errors.join(', ')}`,
+            type: 'error',
+            duration: 9000
+          });
+        }
+        setIsResetQuizAlertOpen(false);
+      },
+      onError: (error) => {
+        toaster.create({
+          title: 'エラー',
+          description: `クイズリセット中にエラーが発生しました: ${error.message}`,
+          type: 'error',
+          duration: 9000
+        });
+        setIsResetQuizAlertOpen(false);
+      },
+    }
+  );
+
   const [startNextQuestion, { loading: startNextLoading }] = useMutation<StartNextQuestionData>(
     START_NEXT_QUESTION,
     {
@@ -290,6 +342,10 @@ export function QuizControlPanel() {
 
   const handleLogout = () => {
     adminLogout();
+  };
+
+  const handleResetQuiz = () => {
+    resetQuiz();
   };
 
   const handleStartNextQuestion = () => {
@@ -348,6 +404,14 @@ export function QuizControlPanel() {
                 クイズ制御パネル
               </Box>
               <Menu.Separator />
+              <Menu.Item
+                value="reset-quiz"
+                onClick={() => setIsResetQuizAlertOpen(true)}
+                colorPalette="red"
+                color="colorPalette.600"
+              >
+                クイズをリセット
+              </Menu.Item>
               <Menu.Item
                 value="reset"
                 onClick={() => setIsResetAlertOpen(true)}
@@ -560,6 +624,37 @@ export function QuizControlPanel() {
       <Box mt="30px">
         <RankingPanel lottery={isQuizFinished} />
       </Box>
+
+      {/* クイズリセット確認ダイアログ */}
+      <Dialog.Root role="alertdialog"
+        open={isResetQuizAlertOpen}
+        onExitComplete={() => setIsResetQuizAlertOpen(false)}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header fontSize="lg" fontWeight="bold">
+                <Dialog.Title>クイズリセットの確認</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Body>
+                本当にクイズをリセットしますか？クイズ状態、すべての回答、プレイヤーが削除されます。この操作は元に戻せません。
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Dialog.ActionTrigger asChild>
+                  <Button variant="outline" onClick={() => setIsResetQuizAlertOpen(false)}>キャンセル</Button>
+                </Dialog.ActionTrigger>
+                <Button colorPalette="red" bg="colorPalette.solid" onClick={handleResetQuiz} ml={3} loading={resetQuizLoading}>
+                  リセット実行
+                </Button>
+              </Dialog.Footer>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton size="sm" onClick={() => setIsResetQuizAlertOpen(false)} />
+              </Dialog.CloseTrigger>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
 
       {/* セッションリセット確認ダイアログ */}
       <Dialog.Root role="alertdialog"

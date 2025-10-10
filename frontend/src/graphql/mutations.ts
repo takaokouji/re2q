@@ -131,3 +131,15 @@ export const STOP_QUIZ = gql`
     }
   }
 `;
+
+// クイズをリセット（管理者用）
+export const RESET_QUIZ = gql`
+  mutation ResetQuiz {
+    resetQuiz(input: {}) {
+      success
+      deletedAnswersCount
+      deletedPlayersCount
+      errors
+    }
+  }
+`;
