@@ -116,22 +116,23 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
   };
 
   return (
-    <Box minH="100vh" width="84vw" bg="gray.50" display="flex" flexDirection="column">
+    <Box minH="100vh" bg="gray.50" display="flex" flexDirection="column">
       {/* ヘッダー */}
       <Box
-        bg="blue.500"
+        colorPalette="blue"
+        bg="colorPalette.500"
         color="white"
         py={4}
         px={6}
         boxShadow="md"
         transition="background-color 0.2s"
       >
-        <Heading size="md" mb={0}>{ `ID【${me?.name}】` }</Heading>
+        <Heading maxW="65vw" minW="65vw" width="65vw" size="md" mb={0}>{ `ID【${me?.name}】` }</Heading>
       </Box>
 
       {/* 情報表示 */}
-      <Box height="12vh" py={6} px={6} textAlign="center" bg="white" boxShadow="sm">
-        <Text fontSize="md" fontWeight="bold" color="gray.700">
+      <Box height="6rem" py={6} px={6} textAlign="center" bg="white" boxShadow="sm">
+        <Text maxW="65vw" minW="65vw" width="65vw" fontSize="md" fontWeight="bold" color="gray.700">
           {getStatusMessage().split('\n').map((line, index) => (
             <React.Fragment key={index}>
               {line}
@@ -211,7 +212,8 @@ export const AnswerScreen: React.FC<AnswerScreenProps> = ({
                 borderRadius="md"
                 boxShadow="sm"
                 borderLeft="4px solid"
-                borderColor={answer.playerAnswer ? 'green.400' : 'red.400'}
+                colorPalette={answer.playerAnswer ? 'green' : 'red'}
+                borderColor={answer.playerAnswer ? 'colorPalette.400' : 'colorPalette.400'}
               >
                 <HStack justify="space-between">
                   <HStack gap={3}>
