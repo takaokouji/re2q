@@ -590,7 +590,7 @@ export function QuizControlPanel() {
       )}
 
       {/* 質問一覧 */}
-      <Heading size="md" mb="20px">質問一覧</Heading>
+      <Heading size="md" mt="20vh" mb="20px">質問一覧</Heading>
       {questionsLoading ? (
         <Text>読み込み中...</Text>
       ) : (
